@@ -47,3 +47,10 @@ CREATE TABLE tFavorites (
   FOREIGN KEY (content_id) REFERENCES tContent(id),
   FOREIGN KEY (user_id) REFERENCES tUser(id)
 );
+
+CREATE TABLE tSugestion (
+  id INTEGER PRIMARY KEY AUTO_INCREMENT,
+  year INTEGER NOT NULL,
+  title VARCHAR(100) NOT NULL,
+  platform VARCHAR(50) NOT NULL,  
+);
