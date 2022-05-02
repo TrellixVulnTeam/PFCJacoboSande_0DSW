@@ -1,36 +1,92 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { User } from '../common/User';
+import { Content } from '../common/Content';
+import { Icon } from '@mui/material';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import Consts from '../Consts';
-class ListaContent extends React.Component {
-    constructor(props:any) {
+
+interface IListaContentProps {
+
+}
+
+interface IListaContentState {
+    isDataLoaded: boolean;
+}
+
+export default class ListaContent extends React.Component<IListaContentProps, IListaContentState>  {
+    public dataContent: {
+        [key: string]: Content;
+    } = {};
+    public userActual: User | undefined;
+
+    constructor(props: IListaContentProps, state: IListaContentState) {
         super(props);
         this.state = {
-            content: [],
+            isDataLoaded: false,
         };
     }
-    async componentDidMount() {
+
+    public componentDidMount() {
+
+        this.getUser();
+
+
+        this.initContent();
+        // this.mountTableContent();
+    }
+    public componentDidUpdate(prevProps: Readonly<IListaContentProps>, prevState: Readonly<IListaContentState>, snapshot?: any): void {
+
+
+
+    }
+
+    public geticonoSiguiente() {
+        // return `<i class="${getIconClassName("ChevronRightSmall")}" />`;
+        return <ArrowForwardIosIcon />;
+    }
+    public geticonoAnterior() {
+        // return `<i class="${getIconClassName("ChevronLeftSmall")}" />`;
+        return <ArrowBackIosIcon />;
+
+    }
+
+    public async getUser() {
+        let usuario;
+
+        return usuario
+    }
+    public async initContent() {
         let content;
         try {
-            const respuesta = await fetch(`http://localhost:8080/getAllContent.php`,{
-                mode:'cors',
+            const respuesta = await fetch(`http://localhost:8080/getAllContent.php`, {
+                mode: 'cors',
             });
-             content = await respuesta.json();
+            content = await respuesta.json();
         } catch (error) {
             console.log(error)
+            // Manage error codes
         }
-       
-        this.setState({
-            content: content,
+        content.map((item: any) => {
+            var content = new Content(item);
+            this.dataContent[content.title] = content;
         });
+
         console.log(content);
+
+        // this.fillContentTable();
+        this.setState({ isDataLoaded: true });
     }
+
+
 
 
     render() {
         return (
-            <><h2 className='text-white'>hola</h2></>
+
+            <h2>hola</h2>
         );
     }
 }
 
-export default ListaContent;

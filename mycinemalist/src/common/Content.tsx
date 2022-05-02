@@ -1,0 +1,36 @@
+import 'moment/locale/es';
+import { Moment, now } from 'moment';
+import commonStyles from '../common/common.module.scss';
+import * as moment from 'moment';
+
+
+
+export class Content {
+    public id: number;
+    public year: number;
+    public title: string;
+    public sinopsis: string;
+    public platform: string;
+    public director: string;
+    public leading_cast: string;
+    public genre: string;
+    public contentType: string;
+    public image: string;
+    public rating: number;
+
+    constructor(Item: any) {
+        this.id = Item.id = ! null ? Item.id : 0;
+        this.year = Item.year = ! null ? Item.year : 0;
+        this.title = Item.title = ! null ? Item.title : "";
+        this.sinopsis = Item.sinopsis = ! null ? Item.sinopsis : "";
+        this.platform = Item.platform = ! null ? Item.platform : "";
+        this.director = Item.director = ! null ? Item.director : "";
+        this.leading_cast = Item.leading_cast = ! null ? Item.leading_cast : "";
+        this.genre = Item.genre = ! null ? Item.genre : "";
+        this.contentType = Item.contentType = ! null ? Item.contentType : "";
+        this.image = Item.image = ! null ? Item.image : "";
+        this.rating = Item.rating = ! null ? Item.rating : "";
+    }
+}
+
+
