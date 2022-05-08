@@ -17,8 +17,9 @@ export class Content {
     public contentType: string;
     public image: string;
     public rating: number;
+    public isFav:boolean;
 
-    constructor(Item: any) {
+    constructor(Item: any,isFav:boolean) {
         this.id = Item.id = ! null ? Item.id : 0;
         this.year = Item.year = ! null ? Item.year : 0;
         this.title = Item.title = ! null ? Item.title : "";
@@ -30,6 +31,7 @@ export class Content {
         this.contentType = Item.contentType = ! null ? Item.contentType : "";
         this.image = Item.image = ! null ? Item.image : "";
         this.rating = Item.rating = ! null ? Item.rating : "";
+        this.isFav = isFav?true:false;
     }
 }
 

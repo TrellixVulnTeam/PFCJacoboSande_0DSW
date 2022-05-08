@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { User } from "../common/User";
 import { Content } from "../common/Content";
 import Consts from "../Consts";
@@ -28,16 +28,19 @@ import {
   getIconClassName,
   initializeIcons,
 } from "office-ui-fabric-react";
-import "datatables.net";
-
-import "datatables.net-responsive";
-import "datatables.net-buttons";
-import "datatables.net-buttons/js/buttons.html5";
-import "datatables.net-buttons/js/buttons.print";
+import 'datatables.net';
+import 'datatables.net-responsive';
+import 'datatables.net-buttons';
+import 'datatables.net-select';
+import 'datatables.net-buttons/js/buttons.html5';
+import 'datatables.net-buttons/js/buttons.print';
+import ReactDOM from "react-dom";
 
 
 interface IListaContentProps {
-  // dataFromParent: [];
+   dataContent: {
+    [key: number]: Content;
+  };
 }
 
 interface IListaContentState {
@@ -48,12 +51,9 @@ export default class ListaContent extends React.Component<
   IListaContentProps,
   IListaContentState
 > {
-  public dataContent: {
-    [key: string]: Content;
-  } = {};
+
   public userActual;
   public tableContent;
-
   constructor(props: IListaContentProps, state: IListaContentState) {
     super(props);
     this.state = {
@@ -70,7 +70,6 @@ export default class ListaContent extends React.Component<
     // });
     // this.getUser();
     this.initContent();
-    this.mountTableContent();
     // $('#ContentTable').DataTable();
 
   }
@@ -87,33 +86,17 @@ public component
     return usuario;
   }
   public async initContent() {
-    console.log("init");
-    let content;
-    try {
-      const respuesta = await fetch(`http://localhost:8080/getAllContent.php`, {
-        mode: "cors",
-      });
-      content = await respuesta.json();
-    } catch (error) {
-      console.log(error);
-      // Manage error codes
-    }
-    content.map((item) => {
-      var content = new Content(item);
-      this.dataContent[content.title] = content;
-      return true;
-    });
-
-    console.log(content);
-
-    this.setState({ isDataLoaded: true });
+ 
+    this.mountTableContent();
+    console.log("llegan props " +this.props.dataContent)
     this.fillTableContent();
   }
 
   public fillTableContent() {
     console.log("llenar");
     let contentRow = [];
-    $.each(this.dataContent, function (idx, listItem) {
+    $.each(this.props.dataContent, function (idx, listItem) {
+      console.log(listItem);
       contentRow.push([
         listItem.id,
         `<span title='${listItem.title}'>${listItem.title}<span>`,
@@ -132,23 +115,43 @@ public component
     this.tableContent.columns.adjust().draw();
   }
   public geticonoSiguiente() {
-    // return "<span class='icoSiguiente'><span/>";
-    // return <ArrowForwardIosIcon />;
     return `<i class="${getIconClassName("ChevronRightSmall")}" />`;
-    // return `<i class="" />`;
-
-
   }
   public geticonoAnterior() {
-    // return "<span class='icoAnterior'><span/>";
     return `<i class="${getIconClassName("ChevronLeftSmall")}" />`;
-    // return `<i class="" />`;
+  }
+  public renderButtons(ElementoDOM, col, ID) {
+    // const navigate = useNavigate();
+   console.log(ID);
+    let item: Content = this.props.dataContent[ID];
+    console.log("botones" +item);
+    console.log(this.props.dataContent);
+    var StackAcciones = (
+      <Stack grow={false} tokens={{ childrenGap: 8 }} horizontal horizontalAlign={'space-between'}>
 
-    // return <ArrowBackIosIcon />;
+
+        <IconButton iconProps={{ iconName: 'Go' }} title="Abrir en nueva pestaña" ariaLabel="Abrir en nueva pestaña"
+          disabled={false}
+          checked={false}
+          onClick={() => {
+          // navigate('/contentDetail', { state: { item:item} });
+
+          }}
+        />
+        <IconButton iconProps={{ iconName: item.isFav? "HeartFill": "Heart" }} title="Favorito" ariaLabel="Favorito"
+          onClick={() => {
+
+          }}
+        />
+
+      </Stack>
+    )
+
+    ReactDOM.render(StackAcciones, ElementoDOM);
   }
 
+
   public mountTableContent() {
-    console.log("montamos");
     var siguiente = this.geticonoSiguiente();
     var anterior = this.geticonoAnterior();
     // Meter iconos de material ui
@@ -208,6 +211,7 @@ public component
       },
 
       buttons: [],
+      // lengthMenu: [[1, 2, 3, -1], [10, 25, 50, "All"]],
       columnDefs: [
         {
           orderable: false,
@@ -216,7 +220,8 @@ public component
         {
           targets: 0,
           createdCell: (td, cellData, rowData, row, col) => {
-            // this.RenderButtons(td, col, cellData);
+            this.renderButtons(td,col,cellData);
+
           }
         },
         {
@@ -314,7 +319,7 @@ public component
               style={{ width: "100%", padding: "0px" }}
               // className={commonStyles.CMScommon}
             >
-              <table style={{ width: "100%" }} className="table table-striped" id="ContentTable">
+              <table style={{ width: "100%" }} className="display table table-striped" id="ContentTable">
                 <thead>
                   <tr>
                     <th>Acciones</th>
