@@ -1,5 +1,4 @@
-import React from "react";
-import {
+import React, { Component } from 'react';import {
   BrowserRouter as Router,
   Routes,
   Route,
@@ -8,9 +7,15 @@ import {
 import logo from './logo.svg';
 import './App.css';
 import ListaContent from "./components/ListaContent";
+import MainComponent from "./components/MainComponent";
 
-function App() {
-  return (
+class App extends Component {
+
+ public componentDidMount(){
+   console.log("se monto la app y la gozadera tambien")
+ }
+  render() {
+    return (
     <Router>
       <div className="container mt-5">
         <div className="btn-group">
@@ -20,17 +25,19 @@ function App() {
         </div>
         <hr />
         <Routes>
-          <Route path="/listaContent" element={<ListaContent/>}/>
-          <Route path="/favorites">
+          <Route path="/" element={<ListaContent />
+          } />
+          <Route path="/favorites"> 
             {/* <Bla /> */}
-          </Route>
-          <Route path="/suggestion">
+         </Route> 
+         <Route path="/suggestion">
             {/* <User /> */}
-          </Route>
+           </Route>
         </Routes>
       </div>
     </Router>
   );
+        }
 }
 
 export default App;
