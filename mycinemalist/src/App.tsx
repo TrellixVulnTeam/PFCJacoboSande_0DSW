@@ -8,6 +8,9 @@ import logo from './logo.svg';
 import './App.css';
 import ListaContent from "./components/ListaContent";
 import { Content } from './common/Content';
+import LoginRegister from './components/LoginRegister';
+import { Stack } from 'office-ui-fabric-react';
+import { ContextualCliente } from './common/Helper';
 
 
 interface IAppProps {
@@ -16,6 +19,7 @@ interface IAppProps {
 
 interface IAppState {
   isDataLoaded: boolean;
+  isUserLogged: boolean;
 }
 
 
@@ -24,13 +28,15 @@ export default class App extends React.Component<
   IAppState
 > {
   public dataContent: {
-    [key: number]: Content;
+    [key: string]: Content;
   } = {};
 
   constructor(props: IAppProps, state: IAppState) {
     super(props);
     this.state = {
       isDataLoaded: false,
+      isUserLogged: true,
+
     };
 
   }
@@ -58,38 +64,62 @@ export default class App extends React.Component<
       // Manage error codes
     }
     content.map((item) => {
-      var content = new Content(item,true);
-      this.dataContent[content.id] = content;
+      var content = new Content(item, true);
+      this.dataContent[content.title] = content;
       return true;
     });
 
     console.log(content);
     this.setState({ isDataLoaded: true });
   }
+
+  public loggedUser() {
+
+  }
   render() {
     return (
       <Router>
         <div className="container mt-5">
-          <div className="btn-group">
-            <Link to="/listaContent" className="btn btn-dark me-2 border border-3 border-white rounded mt-2" >Inicio</Link>
-            <Link to="/favorites" className="btn btn-dark me-2 border border-3 border-white rounded mt-2" >Mis favoritos</Link>
-            <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2" >Sugerir</Link>
-          </div>
-          <hr />
+          {this.state.isUserLogged &&
+            <><Stack
+              horizontal
+              horizontalAlign='space-between'
+            >
+              <div
+                className="btn-group">
+                <Link to="/listaContent" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link>
+                <Link to="/favorites" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Mis favoritos</Link>
+                <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link>
+              </div>
+              <Stack>
+              <ContextualCliente
+                        nuevaBolsa={() => {
+                          // this.CrearEditarBolsa();
+                        }}
+                        nuevoRegistro={() => {
+                          // this.CrearEditarRegistro(null);
+                        }}
+                      />
+              </Stack>
+
+            </Stack><hr /></>}
+
           <Routes>
-            {this.state.isDataLoaded?(
-              <Route path="/listaContent" element={<ListaContent dataContent={this.dataContent} />
-            } />
-            ):(
+            {/* <Route path="/" element={<LoginRegister submit={this.loggedUser()} /> } /> */}
+            {/* <FormCrear
+        submit={SubmitFormulario.bind(this)}
+        cliente={this.clienteActual}
+        context={this.props.context}
+      ></FormCrear> */}
+            <Route path="/" element={<LoginRegister />} />
+
+            {this.state.isDataLoaded ? (
+              <Route path="/listaContent" element={<ListaContent dataContent={this.dataContent} />} />
+            ) : (
               <></>
             )}
-            
-            <Route path="/favorites">
-              {/* <Bla /> */}
-            </Route>
-            <Route path="/suggestion">
-              {/* <User /> */}
-            </Route>
+
+
           </Routes>
         </div>
       </Router>
