@@ -11,6 +11,7 @@ import { Content } from './common/Content';
 import LoginRegister from './components/LoginRegister';
 import { Stack } from 'office-ui-fabric-react';
 import { ContextualCliente } from './common/Helper';
+import { User } from './common/User';
 
 
 interface IAppProps {
@@ -35,7 +36,7 @@ export default class App extends React.Component<
     super(props);
     this.state = {
       isDataLoaded: false,
-      isUserLogged: true,
+      isUserLogged: false,
 
     };
 
@@ -73,7 +74,10 @@ export default class App extends React.Component<
     this.setState({ isDataLoaded: true });
   }
 
-  public loggedUser() {
+  private async loggedUser(userLogged:User) {
+
+
+
 
   }
   render() {
@@ -92,14 +96,14 @@ export default class App extends React.Component<
                 <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link>
               </div>
               <Stack>
-              <ContextualCliente
-                        nuevaBolsa={() => {
-                          // this.CrearEditarBolsa();
-                        }}
-                        nuevoRegistro={() => {
-                          // this.CrearEditarRegistro(null);
-                        }}
-                      />
+                <ContextualCliente
+                  nuevaBolsa={() => {
+                    // this.CrearEditarBolsa();
+                  }}
+                  nuevoRegistro={() => {
+                    // this.CrearEditarRegistro(null);
+                  }}
+                />
               </Stack>
 
             </Stack><hr /></>}
@@ -111,7 +115,8 @@ export default class App extends React.Component<
         cliente={this.clienteActual}
         context={this.props.context}
       ></FormCrear> */}
-            <Route path="/" element={<LoginRegister />} />
+            <Route path="/" element={<LoginRegister submit={this.loggedUser.bind(this)}
+            />} />
 
             {this.state.isDataLoaded ? (
               <Route path="/listaContent" element={<ListaContent dataContent={this.dataContent} />} />

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@fluentui/example-data": "^8.2.7",
+    "@material-ui/core": "^4.12.4",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
@@ -26,6 +27,7 @@
     "postcss": "^8.4.13",
     "react": "16.9.0",
     "react-dom": "16.9.0",
+    "react-helmet": "^6.1.0",
     "react-number-format": "^4.7.3",
     "react-pdf": "^5.0.0",
     "react-router-dom": "^6.3.0",

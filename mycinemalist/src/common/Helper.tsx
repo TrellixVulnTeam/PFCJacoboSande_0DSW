@@ -72,17 +72,17 @@ export class ContextualCliente extends React.Component<
     var MenuProps: IContextualMenuProps = {
       items: [
         {
-          key: "Bolsa de horas",
-          text: "Bolsa de horas",
-          iconProps: { iconName: "AllCurrency" },
+          key: "Configuracion",
+          text: "Configuración",
+          iconProps: { iconName: "Settings" },
           onClick: () => {
             this.props.nuevaBolsa()
           }
         },
         {
-          key: "Registro de aplicacion",
-          text: "Registro de aplicación",
-          iconProps: { iconName: "Puzzle" },
+          key: "Logout",
+          text: "Logout",
+          iconProps: { iconName: "UserRemove" },
           onClick: () => {
             this.props.nuevoRegistro()
           }
