@@ -16,6 +16,7 @@ const styles = {
   relacionadas: 'relacionadas_a4a8c812',
   colorfondo: 'colorfondo_a4a8c812',
   container: 'container_a4a8c812',
+  divTarjetas:'divTarjetas_a4a8c812',
   logginRgister:'logginRegister_a4a8c812',
   row: 'row_a4a8c812',
   rowBoton: 'rowBoton_a4a8c812',
@@ -33,7 +34,8 @@ const styles = {
   tdWrap: 'tdWrap_a4a8c812',
   tdBotones: 'tdBotones_a4a8c812',
   tdMaster: 'tdMaster_a4a8c812',
-  tdBool: 'tdBool_a4a8c812'
+  tdBool: 'tdBool_a4a8c812',
+  errorSpan:'errorSpan_a4a8c812',
 };
 
 export default styles;

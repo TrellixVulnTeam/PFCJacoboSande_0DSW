@@ -74,9 +74,9 @@ public component
   render(): React.ReactElement<IContentCardProps> {
 
     return (
-        <Stack style={{maxWidth:"24%",display:"flex",border:"1px solid black",padding:"10px"}}
-        horizontal
-        horizontalAlign="space-between" >
+        <div style={{width:"23%",display:"flex",border:"1px solid black",padding:"10px",margin:"10px"}}
+
+         >
           <img  style={{maxWidth:"45%", objectFit: "cover"}}src={this.props.item.image}  alt="" />
           <Stack
           style={{maxWidth:"50%"}}>
@@ -87,7 +87,7 @@ public component
           
 
           </Stack>
-        </Stack>
+        </div>
       
     );
   }

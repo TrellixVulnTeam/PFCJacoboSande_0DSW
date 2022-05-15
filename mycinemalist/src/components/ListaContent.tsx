@@ -28,6 +28,8 @@ import {
   getIconClassName,
   initializeIcons,
 } from "office-ui-fabric-react";
+import { Helmet } from "react-helmet";
+
 import 'datatables.net';
 import 'datatables.net-responsive';
 import 'datatables.net-buttons';
@@ -37,10 +39,11 @@ import 'datatables.net-buttons/js/buttons.print';
 import ReactDOM from "react-dom";
 import ContentCard from "./ContentCard";
 import { getLeadingCommentRanges } from "typescript";
+import { common } from "@material-ui/core/colors";
 
 
 interface IListaContentProps {
-  dataContent: {
+  data: {
     [key: string]: Content;
   };
 }
@@ -90,14 +93,14 @@ export default class ListaContent extends React.Component<
   public async initContent() {
 
     this.mountTableContent();
-    console.log("llegan props " + this.props.dataContent)
+    console.log("llegan props " + this.props.data)
     this.fillTableContent();
   }
  
   public fillTableContent() {
     console.log("llenar");
     let contentRow = [];
-    $.each(this.props.dataContent, function (idx, listItem) {
+    $.each(this.props.data, function (idx, listItem) {
       console.log(listItem);
       contentRow.push([
         listItem.title,
@@ -125,9 +128,9 @@ export default class ListaContent extends React.Component<
   public renderButtons(ElementoDOM, col, ID) {
     // const navigate = useNavigate();
     console.log(ID);
-    let item: Content = this.props.dataContent[ID];
+    let item: Content = this.props.data[ID];
     console.log("botones" + item);
-    console.log(this.props.dataContent);
+    console.log(this.props.data);
     var StackAcciones = (
       <Stack grow={false} tokens={{ childrenGap: 8 }} horizontal horizontalAlign={'space-between'}>
 
@@ -290,83 +293,84 @@ export default class ListaContent extends React.Component<
   render(): React.ReactElement<IListaContentProps> {
 
     return (
-
+      <>
+      {/* <Helmet>
+        <style>{'body { background-color: #ccc; }'}</style>
+      </Helmet> */}
       <Pivot
         id="wrapperTablas"
         style={{
           width: "100%",
         }}
       >
-        <PivotItem headerText="Lista" alwaysRender={true}>
-          <Stack
-            className={commonStyles.espacioTabs}
-            id="contentStack"
-            style={{
-              width: "100%",
-              marginTop: "5px",
-              display: "block",
-            }}
-          >
-            <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
-              <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
-                <Stack grow>
-                  <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{ width: '100%' }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-                    this.tableContent.search(newValue).draw();
-                  }} />
+          <PivotItem headerText="Lista" alwaysRender={true}>
+            <Stack
+              className={commonStyles.espacioTabs}
+              id="contentStack"
+              style={{
+                width: "100%",
+                marginTop: "5px",
+                display: "block",
+              }}
+            >
+              <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
+                <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
+                  <Stack grow>
+                    <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{ width: '100%' }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+                      this.tableContent.search(newValue).draw();
+                    } } />
+                  </Stack>
                 </Stack>
               </Stack>
+              <div
+                id="divTableContent"
+                style={{ width: "100%", padding: "0px" }}
+              >
+                <table style={{ width: "100%" }} className="display table table-striped" id="ContentTable">
+                  <thead>
+                    <tr>
+                      <th>Acciones</th>
+                      <th>Titulo</th>
+                      <th>Plataforma</th>
+                      <th>Géneros</th>
+                      <th>Año</th>
+                      <th>Valoración</th>
+                      <th>Mas...</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ContentTableBody"></tbody>
+                </table>
+              </div>
             </Stack>
-            <div
-              id="divTableContent"
-              style={{ width: "100%", padding: "0px" }}
-            // className={commonStyles.CMScommon}
-            >
-              <table style={{ width: "100%" }} className="display table table-striped" id="ContentTable">
-                <thead>
-                  <tr>
-                    <th>Acciones</th>
-                    <th>Titulo</th>
-                    <th>Plataforma</th>
-                    <th>Géneros</th>
-                    <th>Año</th>
-                    <th>Valoración</th>
-                    <th>Mas...</th>
-                  </tr>
-                </thead>
-                <tbody id="ContentTableBody"></tbody>
-              </table>
-            </div>
-          </Stack>
-        </PivotItem>
+          </PivotItem>
 
-        <PivotItem headerText="Tarjetas" alwaysRender={true}>
-          <Stack
-            className={commonStyles.espacioTabs}
-            id="contentTabs"
-            style={{
-              width: "100%",
-              marginTop: "5px",
-              // display: this.state.isRegistrosDataLoaded ? "block" : "none",
-            }}
-          >
-            <Stack className="TarjetasPivot"
-            horizontal
-            style={{marginTop:"55px"}}
-            horizontalAlign="space-between">
-            {
-            // Object.keys(this.props.dataContent).map((key:string)=>{
-            //   let listitem = this.props.dataContent[key];
-            //   console.log("hola"+listitem);
-            // // return  <ContentCard key={key} item={listitem}></ContentCard>
-            // return <h2>hola</h2>
-            Object.entries(this.props.dataContent).map(([key, value]) => (
-              <ContentCard key={key} item={value}></ContentCard>
-            ))}
-          
+          <PivotItem headerText="Tarjetas" alwaysRender={true}>
+            <Stack
+              className={commonStyles.espacioTabs}
+              id="contentTabs"
+              style={{
+                width: "100%",
+                marginTop: "5px",
+                // display: this.state.isRegistrosDataLoaded ? "block" : "none",
+              }}
+            >
+              <div className={commonStyles.divTarjetas}
+                >
+                {
+                  // Object.keys(this.props.dataContent).map((key:string)=>{
+                  //   let listitem = this.props.dataContent[key];
+                  //   console.log("hola"+listitem);
+                  // // return  <ContentCard key={key} item={listitem}></ContentCard>
+                  // return <h2>hola</h2>
+                  Object.entries(this.props.data).map(([key, value]) => (
+                    <ContentCard key={key} item={value}></ContentCard>
+                  ))}
+
+              </div>
+              
             </Stack>
-          </Stack>
-        </PivotItem>
-      </Pivot>
+          </PivotItem>
+        </Pivot></>
     );
   }
 }

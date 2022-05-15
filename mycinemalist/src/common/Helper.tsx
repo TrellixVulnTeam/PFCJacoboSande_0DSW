@@ -1,5 +1,5 @@
 import * as React from "react";
-
+import emptypicture from "../images/notpicture.png"
 import {
   PrimaryButton,
   IContextualMenuProps,
@@ -37,6 +37,7 @@ import "moment/locale/es";
 import styles from "./common.module.scss";
 import * as moment from "moment";
 import { TestImages } from "@fluentui/example-data";
+import { User } from "./User";
 
 const filterIcon: IIconProps = { iconName: "Filter" };
 const filterSolidIcon: IIconProps = { iconName: "FilterSolid" };
@@ -46,16 +47,11 @@ const filterSolidIcon: IIconProps = { iconName: "FilterSolid" };
 const addIcon: IIconProps = { iconName: "Add" };
 interface IContextualClienteProps {
   disabled?: boolean;
+  user:User;
   checked?: boolean;
-  nuevaBolsa: ()=>void;
-  nuevoRegistro:()=>void;
+  goConfig: ()=>void;
+  goLogout:()=>void;
 }
-const examplePersona: IPersonaSharedProps = {
-  imageUrl: TestImages.personaFemale,
-  imageInitials: 'AL',
-  text: 'Annie Lindqvist',
-
-};
 
 interface IContextualClienteState {}
 
@@ -67,7 +63,13 @@ export class ContextualCliente extends React.Component<
     super(props);
     this.state = {};
   }
-
+   persona: IPersonaSharedProps = {
+    imageUrl: this.props.user.profileImage?this.props.user.profileImage:emptypicture,
+    imageInitials: '',
+    text: ""+this.props.user.name+" "+this.props.user.surname ,
+  
+  };
+  
   public render(): JSX.Element {
     var MenuProps: IContextualMenuProps = {
       items: [
@@ -76,7 +78,7 @@ export class ContextualCliente extends React.Component<
           text: "Configuración",
           iconProps: { iconName: "Settings" },
           onClick: () => {
-            this.props.nuevaBolsa()
+            this.props.goConfig()
           }
         },
         {
@@ -84,7 +86,7 @@ export class ContextualCliente extends React.Component<
           text: "Logout",
           iconProps: { iconName: "UserRemove" },
           onClick: () => {
-            this.props.nuevoRegistro()
+            this.props.goLogout()
           }
         },
       ],
@@ -95,6 +97,7 @@ export class ContextualCliente extends React.Component<
         // text="Nuevo"
         // iconProps={addIcon}
         menuProps={MenuProps}
+        style={{height:"40px"}}
         // onMenuClick={_onMenuClick}
         // By default, the ContextualMenu is re-created each time it's shown and destroyed when closed.
         // Uncomment the next line to hide the ContextualMenu but persist it in the DOM instead.
@@ -104,11 +107,11 @@ export class ContextualCliente extends React.Component<
         // checked={checked}
       >
         <Persona
-        {...examplePersona}
-        text="Annie Lindqvist"
+        {...this.persona}
+        text={""+this.props.user.name+" "+this.props.user.surname }
         size={PersonaSize.size32}
         hidePersonaDetails={false}
-        imageAlt="Annie Lindqvist, status is online"
+        imageAlt={this.props.user.name}
       />
       </DefaultButton>
     );

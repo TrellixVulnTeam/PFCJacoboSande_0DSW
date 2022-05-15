@@ -24,6 +24,8 @@ export class User {
             this.description = Item.description=! null? Item.description : "";
             this.profileImage = Item.profileImage=! null? Item.profileImage : "";
         }
+
+        
     }
 
 

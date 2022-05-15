@@ -9,7 +9,6 @@ import { Helmet } from "react-helmet";
 import logo from '../images/logoproject.png'; // with import
 
 
-
 import {
   Stack,
   PrimaryButton,
@@ -51,7 +50,16 @@ interface ILoginRegisterProps {
     userLogged: User
   ) => Promise<boolean>;
 }
+var showErrors = false;
+interface RegisterUser {
+  name: string;
+  surname: string;
+  description: string;
+  password: string;
+  email: string;
 
+
+}
 interface ILoginRegisterState {
   email: string;
   password: string;
@@ -61,6 +69,13 @@ interface ILoginRegisterState {
   name: string;
   surname: string;
   description: string;
+  errorName: string;
+  errorSurname: string;
+  errorDesc: string;
+  errorPass: string;
+  errorEmail: string;
+  errorConf: string;
+
 }
 
 export default class LoginRegister extends React.Component<
@@ -68,7 +83,7 @@ export default class LoginRegister extends React.Component<
   ILoginRegisterState
 > {
 
-  public userActual;
+  public userActual: RegisterUser;
   public tableContent;
   constructor(props: ILoginRegisterProps, state: ILoginRegisterState) {
     super(props);
@@ -80,13 +95,66 @@ export default class LoginRegister extends React.Component<
       name: "",
       loadingCambio: false,
       surname: "",
-      description: ""
+      description: "",
+      errorName: "",
+      errorSurname: "",
+      errorDesc: "",
+      errorPass: "",
+      errorEmail: "",
+      errorConf: "",
     };
     initializeIcons();
 
   }
 
+  public checkForm(submit?: boolean) {
+    let allOK = true;
+    if (showErrors) {
+
+
+      if (this.state.name.trim()) {
+        this.setState({ errorName: "" })
+      } else {
+        this.setState({ errorName: "Rellene este campo" });
+        allOK = false;
+      }
+      if (this.state.surname.trim()) {
+        this.setState({ errorSurname: "" })
+      } else {
+        this.setState({ errorSurname: "Rellene este campo" });
+        allOK = false;
+      }
+      if (this.state.description.trim()) {
+        this.setState({ errorDesc: "" })
+      } else {
+        this.setState({ errorDesc: "Rellene este campo" });
+        allOK = false;
+      }
+      if (this.state.password.trim()) {
+        this.setState({ errorPass: "" })
+      } else {
+        this.setState({ errorPass: "Rellene este campo" });
+        allOK = false;
+      }
+      if (this.state.password === this.state.confpassword) {
+        this.setState({ errorConf: "" })
+      } else {
+        this.setState({ errorConf: "Las contraseñas no coinciden" });
+        allOK = false;
+      }
+      if (this.state.email.trim()) {
+        this.setState({ errorEmail: "" })
+      } else {
+        this.setState({ errorEmail: "Rellene este campo" });
+        allOK = false;
+      }
+    }
+    if (submit) {
+      return allOK;
+    }
+  }
   public componentDidMount() {
+    showErrors = false;
 
 
   }
@@ -96,7 +164,6 @@ export default class LoginRegister extends React.Component<
     prevState: Readonly<ILoginRegisterState>,
     snapshot?: any
   ): void {
-
     if (this.state.loadingCambio) {
       setTimeout(() => {
         this.setState({
@@ -105,14 +172,93 @@ export default class LoginRegister extends React.Component<
         })
       }, 1000);
     }
+    if (
+      prevState.name != this.state.name ||
+      prevState.surname != this.state.surname ||
+      prevState.description != this.state.description ||
+      prevState.password != this.state.password ||
+      prevState.confpassword != this.state.confpassword ||
+      prevState.email != this.state.email) {
+      this.checkForm(false);
+
+    }
+  }
+  public async login() {
+    let content;
+    let TodoOk: boolean;
+    this.userActual = {
+      email: this.state.email,
+      name: this.state.name,
+      surname: this.state.surname,
+      description: this.state.description,
+      password: this.state.password
+    }
+    const util = JSON.stringify(this.userActual);
+
+    const contenido = await fetch(`http://localhost:8080/logUser.php`, {
+      mode: "cors",
+      method: "POST",
+      body: util,
+    });
+    content = await contenido.json();
+    console.log(content);
+    if (typeof (content)== 'boolean') {
+
+    }else{
+      TodoOk = await this.props.submit(
+        content
+    );
+    }
+    
+  if(TodoOk) {
+    // let navigate = useNavigate();
+
+    // navigate("/listaContent", { replace: true });
   }
 
+}
+  public async registerUser() {
 
-  render(): React.ReactElement<ILoginRegisterProps> {
+  this.userActual = {
+    email: this.state.email,
+    name: this.state.name,
+    surname: this.state.surname,
+    description: this.state.description,
+    password: this.state.password
+  }
 
-    return (
+  const util = JSON.stringify(this.userActual);
+  console.log(util);
+  // ¡Y enviarlo!
+  const respuesta = await fetch(`http://localhost:8080/registerUser.php`, {
+    mode: 'cors',
+    method: "POST",
+    body: util,
+  });
+  const exitoso = await respuesta.json();
+  console.log(exitoso);
+  if (exitoso) {
+    // toast('Videojuego guardado 🎮', {
+    //     position: "top-left",
+    //     autoClose: 2000,
+    //     hideProgressBar: false,
+    //     closeOnClick: true,
+    //     pauseOnHover: true,
+    //     draggable: true,
+    //     progress: undefined,
+    // });
+    console.log("exito")
+
+  } else {
+    // toast.error("Error guardando. Intenta de nuevo");
+  }
+}
+
+render(): React.ReactElement < ILoginRegisterProps > {
+
+  return(
       <div
-        className={commonStyles.logginRgister}
+        className = { commonStyles.logginRgister }
       >
         <Helmet>
           <style>{'body { background-color: #ccc; }'}</style>
@@ -158,12 +304,12 @@ export default class LoginRegister extends React.Component<
                       value={this.state.email ? this.state.email : ""}
                       required={true}
                       autoAdjustHeight />
-                    {/* <span
-         className={commonStyles.errorEmail}
-         style={{ display: this.state.errorEmail ? "block" : "none" }}
-       >
-         {this.state.errorEmail}
-       </span> */}
+                    <span
+                      className={commonStyles.errorSpan}
+                      style={{ display: this.state.errorEmail ? "block" : "none" }}
+                    >
+                      {this.state.errorEmail}
+                    </span>
                     <TextField
                       label="Contraseña"
                       type="password"
@@ -189,7 +335,7 @@ export default class LoginRegister extends React.Component<
                         }}
                         text="Iniciar sesión"
                         onClick={async () => {
-
+                          this.login();
                         }}
                         allowDisabledFocus
                       />
@@ -203,42 +349,66 @@ export default class LoginRegister extends React.Component<
                   style={{ width: "100%" }}
                   tokens={{ childrenGap: 10 }}>
                   <div className={commonStyles.formLoggin}>
-                    <TextField
-                      label={"Nombre"}
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        name: string
-                      ) => {
-                        this.setState({ name: name });
-                      }}
-                      value={this.state.name ? this.state.name : ""}
-                      required={true}
-                      autoAdjustHeight />
-                    <TextField
-                      label={"Apellidos"}
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        surname: string
-                      ) => {
-                        this.setState({ surname: surname });
-                      }}
-                      value={this.state.surname ? this.state.surname : ""}
-                      required={true}
-                      autoAdjustHeight />
-                    <TextField
-                      label={"Descripcion"}
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        description: string
-                      ) => {
-                        this.setState({
-                          description: description,
-                        });
-                      }}
-                      value={this.state.description ? this.state.description : ""}
-                      multiline
-                      autoAdjustHeight
-                    />
+                    <Stack>
+                      <TextField
+                        label={"Nombre"}
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          name: string
+                        ) => {
+                          this.setState({ name: name });
+                        }}
+                        value={this.state.name ? this.state.name : ""}
+                        required={true}
+                        autoAdjustHeight />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorName ? "block" : "none" }}
+                      >
+                        {this.state.errorName}
+                      </span>
+                    </Stack>
+                    <Stack>
+                      <TextField
+                        label={"Apellidos"}
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          surname: string
+                        ) => {
+                          this.setState({ surname: surname });
+                        }}
+                        value={this.state.surname ? this.state.surname : ""}
+                        required={true}
+                        autoAdjustHeight />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorSurname ? "block" : "none" }}
+                      >
+                        {this.state.errorSurname}
+                      </span>
+                    </Stack>
+                    <Stack>
+                      <TextField
+                        label={"Descripcion"}
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          description: string
+                        ) => {
+                          this.setState({
+                            description: description,
+                          });
+                        }}
+                        value={this.state.description ? this.state.description : ""}
+                        multiline
+                        autoAdjustHeight
+                      />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorDesc ? "block" : "none" }}
+                      >
+                        {this.state.errorDesc}
+                      </span>
+                    </Stack>
                     <Label>Imagen de perfil</Label>
                     <Button
                       variant="contained"
@@ -250,49 +420,67 @@ export default class LoginRegister extends React.Component<
                         style={{ padding: "10px" }}
                       />
                     </Button>
-                    <TextField
-                      label={"Email"}
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        email: string
-                      ) => {
-                        this.setState({ email: email });
-                      }}
-                      value={this.state.email ? this.state.email : ""}
-                      required={true}
-                      autoAdjustHeight />
-                    {/* <span
-         className={commonStyles.errorEmail}
-         style={{ display: this.state.errorEmail ? "block" : "none" }}
-       >
-         {this.state.errorEmail}
-       </span> */}
-                    <TextField
-                      label="Contraseña"
-                      type="password"
-                      required={true}
+                    <Stack>
+                      <TextField
+                        label={"Email"}
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          email: string
+                        ) => {
+                          this.setState({ email: email });
+                        }}
+                        value={this.state.email ? this.state.email : ""}
+                        required={true}
+                        autoAdjustHeight />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorEmail ? "block" : "none" }}
+                      >
+                        {this.state.errorEmail}
+                      </span>
+                    </Stack>
+                    <Stack>
+                      <TextField
+                        label="Contraseña"
+                        type="password"
+                        required={true}
 
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        password: string
-                      ) => {
-                        this.setState({ password: password });
-                      }}
-                      value={this.state.password ? this.state.password : ""}
-                      canRevealPassword />
-                    <TextField
-                      label="Confirmar contraseña"
-                      type="password"
-                      required={true}
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          password: string
+                        ) => {
+                          this.setState({ password: password });
+                        }}
+                        value={this.state.password ? this.state.password : ""}
+                        canRevealPassword />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorPass ? "block" : "none" }}
+                      >
+                        {this.state.errorPass}
+                      </span>
+                    </Stack>
+                    <Stack>
+                      <TextField
+                        label="Confirmar contraseña"
+                        type="password"
+                        required={true}
 
-                      onChange={(
-                        ev: React.SyntheticEvent<HTMLElement, Event>,
-                        confpassword: string
-                      ) => {
-                        this.setState({ confpassword: confpassword });
-                      }}
-                      value={this.state.confpassword ? this.state.confpassword : ""}
-                      canRevealPassword />
+                        onChange={(
+                          ev: React.SyntheticEvent<HTMLElement, Event>,
+                          confpassword: string
+                        ) => {
+                          this.setState({ confpassword: confpassword });
+                        }}
+                        value={this.state.confpassword ? this.state.confpassword : ""}
+                        canRevealPassword />
+                      <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorConf ? "block" : "none" }}
+                      >
+                        {this.state.errorConf}
+                      </span>
+                    </Stack>
                     <Stack
                       tokens={{ childrenGap: 10 }}
                       grow={1}
@@ -305,6 +493,10 @@ export default class LoginRegister extends React.Component<
                       <PrimaryButton
                         text="Registrarse"
                         onClick={async () => {
+                          showErrors = true;
+                          if (this.checkForm(true)) {
+                            this.registerUser()
+                          }
 
                         }}
                         allowDisabledFocus
@@ -324,7 +516,11 @@ export default class LoginRegister extends React.Component<
               label="" defaultChecked onText="" offText="" onChange={(
                 ev: React.MouseEvent<HTMLElement>, checked?: boolean
               ) => {
-                this.setState({ loadingCambio: true })
+                this.setState({
+                  loadingCambio: true,
+                  email: "",
+                  password: "", description: "", confpassword: "", name: "", surname: ""
+                })
 
               }} />
             <Label>Inicio sesión</Label>

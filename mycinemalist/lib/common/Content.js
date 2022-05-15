@@ -1,6 +1,6 @@
 import 'moment/locale/es';
 var Content = /** @class */ (function () {
-    function Content(Item) {
+    function Content(Item, isFav) {
         this.id = Item.id = !null ? Item.id : 0;
         this.year = Item.year = !null ? Item.year : 0;
         this.title = Item.title = !null ? Item.title : "";
@@ -12,6 +12,7 @@ var Content = /** @class */ (function () {
         this.contentType = Item.contentType = !null ? Item.contentType : "";
         this.image = Item.image = !null ? Item.image : "";
         this.rating = Item.rating = !null ? Item.rating : "";
+        this.isFav = isFav ? true : false;
     }
     return Content;
 }());

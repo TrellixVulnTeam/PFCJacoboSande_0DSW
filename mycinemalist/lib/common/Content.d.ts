@@ -11,5 +11,6 @@ export declare class Content {
     contentType: string;
     image: string;
     rating: number;
-    constructor(Item: any);
+    isFav: boolean;
+    constructor(Item: any, isFav: boolean);
 }

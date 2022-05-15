@@ -18,3 +18,15 @@
 .logginRegister{
     background-color: lightsalmon !important;
 }
+.divTarjetas{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    
+}
+
+.errorSpan{
+    margin-top:5px;
+    color:rgb(164, 38, 44);
+  }
