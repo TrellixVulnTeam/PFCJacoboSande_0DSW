@@ -38,10 +38,13 @@ import ReactDOM from "react-dom";
 
 
 interface IContentCardProps {
-  item:Content;
+  item: Content;
+  details: (title) => void;
+  changeFav: (title,pivot) => void;
 }
 
 interface IContentCardState {
+  detailsVisible: boolean;
 }
 
 export default class ContentCard extends React.Component<
@@ -54,6 +57,7 @@ export default class ContentCard extends React.Component<
   constructor(props: IContentCardProps, state: IContentCardState) {
     super(props);
     this.state = {
+      detailsVisible: false,
     };
     initializeIcons();
 
@@ -62,7 +66,7 @@ export default class ContentCard extends React.Component<
   public componentDidMount() {
     console.log()
   }
-public component
+  public component
   public componentDidUpdate(
     prevProps: Readonly<IContentCardProps>,
     prevState: Readonly<IContentCardState>,
@@ -74,21 +78,37 @@ public component
   render(): React.ReactElement<IContentCardProps> {
 
     return (
-        <div style={{width:"23%",display:"flex",border:"1px solid black",padding:"10px",margin:"10px"}}
+      <
+        >
+        <div
+          className={commonStyles.contentCard}
+          style={{ width: "18%", border: "1px solid black", padding: "10px", margin: "10px" }}
 
-         >
-          <img  style={{maxWidth:"45%", objectFit: "cover"}}src={this.props.item.image}  alt="" />
+        >
+
+          <img style={{ width: "100%", minHeight: "350px", objectFit: "cover", marginBottom: "-8px" }} src={this.props.item.image} alt="" />
+          <hr />
           <Stack
-          style={{maxWidth:"50%"}}>
-          <span>{this.props.item.title}</span>
-          <span>{this.props.item.genre}</span>
-          <span>{this.props.item.year}</span>
-          <span>{this.props.item.platform}</span>
-          
-
+            style={{ marginTop: "-15px", marginBottom: "-10px" }}
+            horizontal
+            horizontalAlign="center">
+            <IconButton iconProps={{ iconName: 'Go' }} title="Abrir en nueva pestaña" ariaLabel="Abrir en nueva pestaña"
+              disabled={false}
+              checked={false}
+              onClick={() => {
+                this.props.details(this.props.item.title);
+              }}
+            />
+            <IconButton iconProps={{ iconName: this.props.item.isFav ? "HeartFill" : "Heart" }} title="Favorito" ariaLabel="Favorito"
+              onClick={() => {
+                this.props.changeFav(this.props.item.title,1);
+              }}
+            />
           </Stack>
+
         </div>
-      
+      </>
+
     );
   }
 }

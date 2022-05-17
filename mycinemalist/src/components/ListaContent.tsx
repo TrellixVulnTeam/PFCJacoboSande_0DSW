@@ -46,6 +46,11 @@ interface IListaContentProps {
   data: {
     [key: string]: Content;
   };
+  details: (title) => void;
+  changeFav: (title,pivot) => void;
+  selectedKey : string;
+
+
 }
 
 interface IListaContentState {
@@ -96,7 +101,7 @@ export default class ListaContent extends React.Component<
     console.log("llegan props " + this.props.data)
     this.fillTableContent();
   }
- 
+
   public fillTableContent() {
     console.log("llenar");
     let contentRow = [];
@@ -139,12 +144,20 @@ export default class ListaContent extends React.Component<
           disabled={false}
           checked={false}
           onClick={() => {
+            this.props.details(item.title);
             // navigate('/contentDetail', { state: { item:item} });
+
 
           }}
         />
+        
         <IconButton iconProps={{ iconName: item.isFav ? "HeartFill" : "Heart" }} title="Favorito" ariaLabel="Favorito"
           onClick={() => {
+          
+            this.props.changeFav(item.title,0);
+            setTimeout(() => {
+              // this.reRender();
+            }, 400);
 
           }}
         />
@@ -294,16 +307,17 @@ export default class ListaContent extends React.Component<
 
     return (
       <>
-      {/* <Helmet>
-        <style>{'body { background-color: #ccc; }'}</style>
+        {/* <Helmet>
+        <style>{'body { background: url(https://images.unsplash.com/photo-1544306094-e2dcf9479da3) no-repeat; }'}</style>
       </Helmet> */}
-      <Pivot
-        id="wrapperTablas"
-        style={{
-          width: "100%",
-        }}
-      >
-          <PivotItem headerText="Lista" alwaysRender={true}>
+        <Pivot
+          id="wrapperTablas"
+          style={{
+            width: "100%",
+          }}
+          defaultSelectedKey={this.props.selectedKey}
+        >
+          <PivotItem headerText="Lista" alwaysRender={true} itemKey="0">
             <Stack
               className={commonStyles.espacioTabs}
               id="contentStack"
@@ -318,7 +332,7 @@ export default class ListaContent extends React.Component<
                   <Stack grow>
                     <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{ width: '100%' }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
                       this.tableContent.search(newValue).draw();
-                    } } />
+                    }} />
                   </Stack>
                 </Stack>
               </Stack>
@@ -344,7 +358,7 @@ export default class ListaContent extends React.Component<
             </Stack>
           </PivotItem>
 
-          <PivotItem headerText="Tarjetas" alwaysRender={true}>
+          <PivotItem headerText="Tarjetas" alwaysRender={true} itemKey="1">
             <Stack
               className={commonStyles.espacioTabs}
               id="contentTabs"
@@ -355,7 +369,7 @@ export default class ListaContent extends React.Component<
               }}
             >
               <div className={commonStyles.divTarjetas}
-                >
+              >
                 {
                   // Object.keys(this.props.dataContent).map((key:string)=>{
                   //   let listitem = this.props.dataContent[key];
@@ -363,11 +377,20 @@ export default class ListaContent extends React.Component<
                   // // return  <ContentCard key={key} item={listitem}></ContentCard>
                   // return <h2>hola</h2>
                   Object.entries(this.props.data).map(([key, value]) => (
-                    <ContentCard key={key} item={value}></ContentCard>
+                    <ContentCard 
+                    changeFav={(title,pivot) => {
+                      this.props.changeFav(title,pivot);
+                    }} 
+                    key={key} item={value} 
+                    details={(title) => { 
+                      this.props.details(title);
+                     }}
+
+                    />
                   ))}
 
               </div>
-              
+
             </Stack>
           </PivotItem>
         </Pivot></>

@@ -14,7 +14,7 @@ export class Content {
     public director: string;
     public leading_cast: string;
     public genre: string;
-    public contentType: string;
+    public content_type: string;
     public image: string;
     public rating: number;
     public isFav:boolean;
@@ -28,7 +28,7 @@ export class Content {
         this.director = Item.director = ! null ? Item.director : "";
         this.leading_cast = Item.leading_cast = ! null ? Item.leading_cast : "";
         this.genre = Item.genre = ! null ? Item.genre : "";
-        this.contentType = Item.contentType = ! null ? Item.contentType : "";
+        this.content_type = Item.content_type = ! null ? Item.content_type : "";
         this.image = Item.image = ! null ? Item.image : "";
         this.rating = Item.rating = ! null ? Item.rating : "";
         this.isFav = isFav?true:false;

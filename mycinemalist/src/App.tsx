@@ -4,6 +4,7 @@ import React, { Component, useEffect, useState } from 'react'; import {
   Route,
   Link,
   useNavigate,
+  useLocation,
 
 } from "react-router-dom";
 import logo from './logo.svg';
@@ -11,26 +12,18 @@ import './App.css';
 import ListaContent from "./components/ListaContent";
 import { Content } from './common/Content';
 import LoginRegister from './components/LoginRegister';
+import Detail from './components/Detail';
 import { initializeIcons, Stack } from 'office-ui-fabric-react';
 import { ContextualCliente } from './common/Helper';
 import { User } from './common/User';
 import { CircularProgress } from '@material-ui/core';
 import { setTimeout } from 'timers/promises';
 
-interface IAppProps {
-  // dataFromParent: [];
-}
-
-interface IAppState {
-  isDataLoaded: boolean;
-  isUserLogged: boolean;
-  userLogged: User;
-}
 
 
 function App(props) {
   const navigate = useNavigate();
-
+  const location = useLocation();
   const dataContent: {
     [key: string]: Content;
   } = {};
@@ -40,6 +33,9 @@ function App(props) {
 
   const [data, setData] = useState({})
   const [userData, setUserData] = useState({})
+  const [selectedKey, setSelectedKey] = useState("0")
+
+  const [loadingFav, setLoadingFav] = useState(false);
 
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -51,13 +47,22 @@ function App(props) {
     console.log("se monto la app y la gozadera tambien")
     initializeIcons();
     getUsers();
-    
+
     // window.setTimeout(() => {
 
     // }, 400);
 
 
   }, [])
+
+
+  useEffect(() => {
+    window.setTimeout(() => {
+      setLoadingFav(false);
+
+    }, 500);
+
+  }, [loadingFav]);
 
 
 
@@ -73,13 +78,13 @@ function App(props) {
 
 
   useEffect(() => {
-    if(usersLoaded){
-    if (checkLogged()) {
-      startPage();
-    } else {
-      setLoading(false);
+    if (usersLoaded) {
+      if (checkLogged()) {
+        startPage();
+      } else {
+        setLoading(false);
+      }
     }
-  }
   }, [usersLoaded]);
 
 
@@ -147,26 +152,70 @@ function App(props) {
       console.log(error);
       // Manage error codes
     }
-    favs.map((item) =>{
+    favs.map((item) => {
       favArray.push(item.content_id)
     });
     content.map((item) => {
-      var content = new Content(item, isFav(item,favArray));
+      var content = new Content(item, isFav(item, favArray));
       dataContent[content.title] = content;
       return true;
     });
-    
+
     setData(dataContent)
     console.log(dataContent);
     setIsDataLoaded(true);
   }
-  const isFav = (item,favs) =>{
+  const isFav = (item, favs) => {
     return (favs.includes(item.id));
   }
   const LoggedUser = (id: number) => {
     console.log("loggeado");
     window.localStorage.setItem('id', id.toString());
     startPage();
+  }
+
+  const goDetails = (title) => {
+    console.log(title);
+    navigate("/detail", {
+      state: {
+        item: data[title],
+        comments: null
+      }
+    });
+  }
+
+  const changeFav = async (title, pivot) => {
+    if (data[title].isFav) {
+      const respuesta = await fetch(`http://localhost:8080/delFav.php?user_id=${userLogged.id}&content_id=${data[title].id}`, {
+        method: "DELETE",
+      });
+      const succes = await respuesta.json();
+
+    } else {
+      let fav = {
+        user_id: userLogged.id,
+        content_id: data[title].id
+      }
+      const util = JSON.stringify(fav);
+
+      const respuesta = await fetch(`http://localhost:8080/newFav.php`, {
+        mode: 'cors',
+        method: "POST",
+        body: util,
+      });
+
+      const succes = await respuesta.json();
+      if (succes) {
+
+      }
+    }
+    setSelectedKey(pivot.toString());
+    setLoadingFav(true);
+
+    data[title].isFav = !data[title].isFav;
+    console.log(data[title].isFav);
+
+    console.log(title);
   }
 
   const goConfig = () => {
@@ -183,8 +232,13 @@ function App(props) {
     setUserLogged(null);
     navigate("/");
   }
+  const submitComment = (text, rating) => {
 
-  if (loading) return <CircularProgress color="inherit" size="200px" />
+  }
+  if (loading) return <Stack
+    style={{ width: "100%", marginTop: "150px" }}
+    horizontal
+    horizontalAlign='center'><CircularProgress color="inherit" size="100px" /></Stack>
     ;
   return (
     <>
@@ -221,18 +275,33 @@ function App(props) {
         }
 
         <Routes>
-          {/* <Route path="/" element={<LoginRegister submit={this.loggedUser()} /> } /> */}
-          {/* <FormCrear
-        submit={SubmitFormulario.bind(this)}
-        cliente={this.clienteActual}
-        context={this.props.context}
-      ></FormCrear> */}
+
           <Route path="/" element={<LoginRegister submit={LoggedUser.bind(this)}
           />} />
+          {!loadingFav ? (
+            <Route path="/main"
+              element={<ListaContent
+                details={(title) => {
+                  goDetails(title);
+                }}
+                data={data}
+                selectedKey={selectedKey}
+                changeFav={(title, pivot) => {
+                  changeFav(title, pivot);
+                }} />} />) : (
 
-          {/* {isDataLoaded && */}
-          <Route path="/main" element={<ListaContent data={data} />} />
-          {/* } */}
+            <Route path="/main"
+              element={<Stack
+                style={{ width: "100%", marginTop: "150px" }}
+                horizontal
+                horizontalAlign='center'><CircularProgress color="inherit" size="100px" /></Stack>} />
+          )}
+
+          <Route path="/detail" element={<Detail location={location} submit={(title, rating) => {
+            submitComment(title, rating);
+          }} />} />
+
+
 
 
         </Routes>

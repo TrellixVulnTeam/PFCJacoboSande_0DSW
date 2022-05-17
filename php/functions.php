@@ -23,6 +23,7 @@ function getFavsUser($id)
 
     return $sentencia->fetchAll();
 }
+
 function registerUser($user)
 {
     $password=password_hash($user->password, PASSWORD_BCRYPT);
@@ -30,6 +31,19 @@ function registerUser($user)
     $sentencia = $bd->prepare("INSERT INTO tUser (name, surname, email,encrypted_password,description,profile_image) VALUES (?, ?, ?, ?, ?, ?)");
     return $sentencia->execute([$user->name, $user->surname,$user->email,$password,$user->description,""]);
 }
+function delFav($user_id,$content_id)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("DELETE FROM tFavorites WHERE user_id = ? AND content_id = ?");
+    return $sentencia->execute([$user_id,$content_id]);
+}
+function newFav($fav)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("INSERT INTO tFavorites (content_id,user_id) VALUES (?, ?)");
+    return $sentencia->execute([$fav->content_id, $fav->user_id]);
+}
+
 function logUser($user){
     // $password=password_hash($user->password, PASSWORD_BCRYPT);
     $bd = get_db_connection_or_die();

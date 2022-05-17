@@ -36,6 +36,10 @@ const styles = {
   tdMaster: 'tdMaster_a4a8c812',
   tdBool: 'tdBool_a4a8c812',
   errorSpan:'errorSpan_a4a8c812',
+  contentCard:'contentCard_a4a8c812',
+  detailField:'detailField_a4a8c812',
+  detailLabel:'detailLabel_a4a8c812',
+
 };
 
 export default styles;
