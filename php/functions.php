@@ -18,7 +18,7 @@ function getAllUsers()
 function getFavsUser($id)
 {
     $db = get_db_connection_or_die();
-	$sentencia = $db->prepare("SELECT id, content_id,user_id FROM tFavorites where user_id = ?");
+	$sentencia = $db->prepare("SELECT content_id FROM tFavorites where user_id = ?");
     $sentencia->execute([$id]);
 
     return $sentencia->fetchAll();
@@ -42,7 +42,7 @@ function logUser($user){
         return $result[0];
         exit;
     } else {
-        return false;
+        header("Location: logUser.php?login_failed_password=True");
         exit;
     }
 

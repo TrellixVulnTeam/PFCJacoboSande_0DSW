@@ -193,17 +193,19 @@ export default class LoginRegister extends React.Component<
       description: this.state.description,
       password: this.state.password
     }
-    const util = JSON.stringify(this.userActual);
 
+    const util = JSON.stringify(this.userActual);
+console.log(util);
     const contenido = await fetch(`http://localhost:8080/logUser.php`, {
       mode: "cors",
       method: "POST",
       body: util,
     });
+  
     content = await contenido.json();
     console.log(content);
-    if (typeof (content)== 'boolean') {
-
+    if (content ==="pwd") {
+        this.setState({errorPass:"Contraseña incorrecta"});
     }else{
       TodoOk = await this.props.submit(
         content
@@ -310,6 +312,12 @@ render(): React.ReactElement < ILoginRegisterProps > {
                     >
                       {this.state.errorEmail}
                     </span>
+                    <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorEmail ? "block" : "none" }}
+                      >
+                        {this.state.errorEmail}
+                      </span>
                     <TextField
                       label="Contraseña"
                       type="password"
@@ -323,6 +331,12 @@ render(): React.ReactElement < ILoginRegisterProps > {
 
                       value={this.state.password ? this.state.password : ""}
                       canRevealPassword />
+                       <span
+                        className={commonStyles.errorSpan}
+                        style={{ display: this.state.errorPass ? "block" : "none" }}
+                      >
+                        {this.state.errorPass}
+                      </span>
                     <Stack
                       tokens={{ childrenGap: 10 }}
                       grow={1}

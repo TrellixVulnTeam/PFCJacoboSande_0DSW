@@ -64,9 +64,9 @@ export class ContextualCliente extends React.Component<
     this.state = {};
   }
    persona: IPersonaSharedProps = {
-    imageUrl: this.props.user.profileImage?this.props.user.profileImage:emptypicture,
+    imageUrl: this.props.user?this.props.user.profileImage:emptypicture,
     imageInitials: '',
-    text: ""+this.props.user.name+" "+this.props.user.surname ,
+    text: this.props.user?""+this.props.user.name+" "+this.props.user.surname:"Undefined" ,
   
   };
   
@@ -108,10 +108,10 @@ export class ContextualCliente extends React.Component<
       >
         <Persona
         {...this.persona}
-        text={""+this.props.user.name+" "+this.props.user.surname }
+        text={this.persona.text }
         size={PersonaSize.size32}
         hidePersonaDetails={false}
-        imageAlt={this.props.user.name}
+        imageAlt={this.persona.text }
       />
       </DefaultButton>
     );

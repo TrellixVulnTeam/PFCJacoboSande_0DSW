@@ -15,6 +15,7 @@ import { initializeIcons, Stack } from 'office-ui-fabric-react';
 import { ContextualCliente } from './common/Helper';
 import { User } from './common/User';
 import { CircularProgress } from '@material-ui/core';
+import { setTimeout } from 'timers/promises';
 
 interface IAppProps {
   // dataFromParent: [];
@@ -38,7 +39,11 @@ function App(props) {
   } = {};
 
   const [data, setData] = useState({})
+  const [userData, setUserData] = useState({})
+
+  const [usersLoaded, setUsersLoaded] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [isUserLogged, setIsUserLogged] = useState(false);
   const [userLogged, setUserLogged] = useState(null);
 
@@ -46,15 +51,49 @@ function App(props) {
     console.log("se monto la app y la gozadera tambien")
     initializeIcons();
     getUsers();
-    checkLogged();
+    
+    // window.setTimeout(() => {
+
+    // }, 400);
+
 
   }, [])
 
-  useEffect(() => {
-    if (userLogged != null)
-      initContent();
 
-  }, [userLogged]); // <- add the count variable here
+
+  useEffect(() => {
+    if (userLogged != null) {
+      window.setTimeout(() => {
+        navigate("/main");
+        setLoading(false);
+      }, 500);
+    }
+
+  }, [userLogged]);
+
+
+  useEffect(() => {
+    if(usersLoaded){
+    if (checkLogged()) {
+      startPage();
+    } else {
+      setLoading(false);
+    }
+  }
+  }, [usersLoaded]);
+
+
+  const startPage = () => {
+
+    setLoading(true);
+    initContent();
+    setIsUserLogged(true);
+    console.log(userLogged);
+    console.log(userData);
+    setUserLogged(userData[parseInt(window.localStorage.getItem('id'))]);
+
+
+  }
 
   const getUsers = async () => {
     const usersfetch = await fetch(`http://localhost:8080/getAllUsers.php`, {
@@ -69,105 +108,117 @@ function App(props) {
       return true;
 
     });
+    setUserData(dataUsers);
+
+    setUsersLoaded(true);
     console.log(dataUsers);
   }
-  const checkLogged = async () => {
 
-    const user = await fetch(`http://localhost:8080/getLoggedUser.php`, {
-      mode: "cors",
-    });
-    let userid = await user.json();
-    console.log(userid);
-    if (userid != 0) {
-      setUserLogged(dataUsers[userid])
-      console.log("entre");
-      setIsUserLogged(true);
-    }
-
+  const checkLogged = () => {
+    let id = window.localStorage.getItem('id');
+    console.log(id);
+    return (id !== "null");
+    // if (id != "null") {
+    //   console.log(userLogged);
+    //   console.log(dataUsers[id]);
+    //   setUserLogged(dataUsers[id])
+    //   console.log("entre " + id);
+    //   setIsUserLogged(true);
+    // }
 
   }
   const initContent = async () => {
-
     console.log("init");
     let content;
     let favs;
+    let favArray = [];
     try {
       const contenido = await fetch(`http://localhost:8080/getAllContent.php`, {
         mode: "cors",
       });
 
-      // const favoritos = await fetch(`http://localhost:8080/getFavsUser.php`, {
-      //   mode: "cors",
-      //   method: 'POST',
-      //   body: userLogged.id
-      // });
+      const favoritos = await fetch(`http://localhost:8080/getFavsUser.php?id=${window.localStorage.getItem('id')}`, {
+        mode: "cors",
+      });
       content = await contenido.json();
-      // favs = await favoritos.json();
+      favs = await favoritos.json();
 
     } catch (error) {
       console.log(error);
       // Manage error codes
     }
+    favs.map((item) =>{
+      favArray.push(item.content_id)
+    });
     content.map((item) => {
-      var content = new Content(item, true);
+      var content = new Content(item, isFav(item,favArray));
       dataContent[content.title] = content;
       return true;
     });
+    
     setData(dataContent)
-
     console.log(dataContent);
     setIsDataLoaded(true);
-    navigate("/listaContent");
-
+  }
+  const isFav = (item,favs) =>{
+    return (favs.includes(item.id));
   }
   const LoggedUser = (id: number) => {
-
-    setIsUserLogged(true);
-    setUserLogged(dataUsers[id]);
-
     console.log("loggeado");
+    window.localStorage.setItem('id', id.toString());
+    startPage();
   }
-  const goConfig = () =>{
+
+  const goConfig = () => {
 
   }
 
-  const goLogout = async () =>{
-    const contenido = await fetch(`http://localhost:8080/goLogout.php`, {
-      mode: "cors",
-    });
+  const test = async () => {
+    console.log(window.localStorage.getItem('id'));
+    console.log("isuser" + isUserLogged + " user:+" + userLogged.name);
+  }
+  const goLogout = async () => {
+    window.localStorage.setItem('id', "null");
     setIsUserLogged(false);
     setUserLogged(null);
     navigate("/");
   }
-  if (!isDataLoaded && isUserLogged) return <CircularProgress color="inherit" size="200px" />
+
+  if (loading) return <CircularProgress color="inherit" size="200px" />
     ;
   return (
     <>
       <div className="container mt-5">
+        <button onClick={test}>TEST</button>
         {isUserLogged &&
           <><Stack
             horizontal
+            // style={{display:isUserLogged?'block':'none'}}
             horizontalAlign='space-between'
           >
             <div
               className="btn-group">
-              <Link to="/listaContent" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link>
+              <Link to="/main" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link>
               <Link to="/favorites" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Mis favoritos</Link>
               <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link>
             </div>
-            <Stack>
-              <ContextualCliente
-                goConfig={() => {
-                  // goToConfig();
-                }}
-                goLogout={() => {
-                  goLogout();
-                }}
-                user={userLogged}
-              />
-            </Stack>
+            {userLogged != null &&
+              <Stack
+                style={{ marginBottom: "10px" }}>
+                <ContextualCliente
+                  goConfig={() => {
+                    // goToConfig();
+                  }}
+                  goLogout={() => {
+                    goLogout();
+                  }}
+                  user={userLogged} />
+              </Stack>}
 
-          </Stack><hr /></>}
+
+          </Stack><hr /></>
+
+        }
 
         <Routes>
           {/* <Route path="/" element={<LoginRegister submit={this.loggedUser()} /> } /> */}
@@ -180,7 +231,7 @@ function App(props) {
           />} />
 
           {/* {isDataLoaded && */}
-          <Route path="/listaContent" element={<ListaContent data={data} />} />
+          <Route path="/main" element={<ListaContent data={data} />} />
           {/* } */}
 
 
