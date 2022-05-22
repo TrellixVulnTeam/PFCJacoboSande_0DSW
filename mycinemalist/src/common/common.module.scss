@@ -4,6 +4,7 @@
 @import 'https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css';  
 @import 'https://cdn.datatables.net/buttons/1.6.0/css/buttons.dataTables.min.css';  
 
+$transition-collapse:         height .35s ease;
 
 .formLoggin{
     background-color: #ccc;
@@ -25,7 +26,17 @@
 
     
 }
+.collapse {
+  &:not(.show) {
+    display: none;
+  }
+}
 
+.collapsing {
+  height: 0;
+  overflow: hidden;
+  // @include transition($transition-collapse);
+}
 .errorSpan{
     margin-top:5px;
     color:rgb(164, 38, 44);

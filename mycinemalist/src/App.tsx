@@ -11,14 +11,19 @@ import logo from './logo.svg';
 import './App.css';
 import ListaContent from "./components/ListaContent";
 import { Content } from './common/Content';
+import { Comment } from './common/Comment';
+import { Helmet } from "react-helmet";
+
 import LoginRegister from './components/LoginRegister';
 import Detail from './components/Detail';
 import { initializeIcons, Stack } from 'office-ui-fabric-react';
 import { ContextualCliente } from './common/Helper';
 import { User } from './common/User';
-import { CircularProgress } from '@material-ui/core';
+import { CircularProgress, Snackbar, } from '@material-ui/core';
 import { setTimeout } from 'timers/promises';
-
+import Profile from './components/Profile';
+import Suggestions from './components/Suggestions';
+// import MuiAlert, { AlertProps } from '@material-ui/Alert';
 
 
 function App(props) {
@@ -33,9 +38,17 @@ function App(props) {
 
   const [data, setData] = useState({})
   const [userData, setUserData] = useState({})
+  const [commentData, setCommentData] = useState({})
+
   const [selectedKey, setSelectedKey] = useState("0")
+  const [snackMessage, setSnackMessage] = useState("")
+
 
   const [loadingFav, setLoadingFav] = useState(false);
+  const [SnackOpen, setSnackOpen] = useState(false);
+
+  const [loadingComment, setLoadingComment] = useState(false);
+
 
   const [usersLoaded, setUsersLoaded] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -136,6 +149,7 @@ function App(props) {
     console.log("init");
     let content;
     let favs;
+    //  let comments;
     let favArray = [];
     try {
       const contenido = await fetch(`http://localhost:8080/getAllContent.php`, {
@@ -145,6 +159,7 @@ function App(props) {
       const favoritos = await fetch(`http://localhost:8080/getFavsUser.php?id=${window.localStorage.getItem('id')}`, {
         mode: "cors",
       });
+
       content = await contenido.json();
       favs = await favoritos.json();
 
@@ -161,10 +176,12 @@ function App(props) {
       return true;
     });
 
-    setData(dataContent)
+    setData(dataContent);
     console.log(dataContent);
     setIsDataLoaded(true);
   }
+
+
   const isFav = (item, favs) => {
     return (favs.includes(item.id));
   }
@@ -184,12 +201,28 @@ function App(props) {
     });
   }
 
+  const goUserProfile = (id) => {
+    console.log(id);
+    navigate("/profile", {
+      state: {
+        user: userData[id]
+      }
+    });
+  }
+
   const changeFav = async (title, pivot) => {
     if (data[title].isFav) {
-      const respuesta = await fetch(`http://localhost:8080/delFav.php?user_id=${userLogged.id}&content_id=${data[title].id}`, {
-        method: "DELETE",
-      });
-      const succes = await respuesta.json();
+      try {
+        const respuesta = await fetch(`http://localhost:8080/delFav.php?user_id=${userLogged.id}&content_id=${data[title].id}`, {
+          method: "DELETE",
+        });
+        const succes = await respuesta.json();
+        setSnackMessage("Favorito eliminado");
+        setSnackOpen(true);
+      } catch (error) {
+        console.log(error);
+      }
+
 
     } else {
       let fav = {
@@ -205,6 +238,8 @@ function App(props) {
       });
 
       const succes = await respuesta.json();
+      setSnackMessage("Favorito añadido");
+      setSnackOpen(true);
       if (succes) {
 
       }
@@ -219,7 +254,11 @@ function App(props) {
   }
 
   const goConfig = () => {
-
+    navigate("/profile", {
+      state: {
+        user: userData[window.localStorage.getItem('id')]
+      }
+    });
   }
 
   const test = async () => {
@@ -232,9 +271,67 @@ function App(props) {
     setUserLogged(null);
     navigate("/");
   }
-  const submitComment = (text, rating) => {
+  const submitComment = async (comment, rating, content_id, user_id, title) => {
+    let Comment = {
+      content_id: content_id,
+      user_id: user_id,
+      comment: comment,
+      rating: rating,
+    }
 
+    const util = JSON.stringify(Comment);
+    console.log(util);
+    // ¡Y enviarlo!
+    const respuesta = await fetch(`http://localhost:8080/newComment.php`, {
+      mode: 'cors',
+      method: "POST",
+      body: util,
+    });
+    const exitoso = await respuesta.json();
+    setLoading(true);
+    window.setTimeout(() => {
+      setLoading(false);
+
+      navigate("/detail", {
+        state: {
+          item: data[title],
+          comments: null
+        }
+      });
+    }, 300);
+
+
+    // validar respuesta
   }
+
+  const updateProfile = async (name, surname, description, image, id) => {
+
+    let user = {
+      id: id,
+      name: name,
+      surname: surname,
+      description: description,
+    }
+    console.log(user);
+    const cargaUtil = JSON.stringify(user);
+    // ¡Y enviarlo!
+    const respuesta = await fetch(`http://localhost:8080/updateUser.php`, {
+      method: "PUT",
+      body: cargaUtil,
+    });
+
+    console.log(respuesta);
+  }
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setSnackOpen(false);
+  };
+
+
   if (loading) return <Stack
     style={{ width: "100%", marginTop: "150px" }}
     horizontal
@@ -242,6 +339,9 @@ function App(props) {
     ;
   return (
     <>
+      {/* <Helmet>
+          <style>{'body { background-color: #14181c;!important } *{background-color:#202830; color:#9ab ;!important}'}</style>
+        </Helmet> */}
       <div className="container mt-5">
         <button onClick={test}>TEST</button>
         {isUserLogged &&
@@ -261,7 +361,7 @@ function App(props) {
                 style={{ marginBottom: "10px" }}>
                 <ContextualCliente
                   goConfig={() => {
-                    // goToConfig();
+                    goConfig();
                   }}
                   goLogout={() => {
                     goLogout();
@@ -297,14 +397,37 @@ function App(props) {
                 horizontalAlign='center'><CircularProgress color="inherit" size="100px" /></Stack>} />
           )}
 
-          <Route path="/detail" element={<Detail location={location} submit={(title, rating) => {
+          {/* <Route path="/detail" element={<Detail location={location} submit={(title, rating) => {
             submitComment(title, rating);
-          }} />} />
+          }} />} /> */}
 
+          <Route path="/profile" element={<Profile
+            updateProfile={(name, surname, description, image, id) => {
+              updateProfile(name, surname, description, image, id);
+            }}
+            location={location} />} />
+
+          <Route path="/detail" element={<Detail location={location}
+            submit={(comment, rating, content_id, user_id, title) => {
+              submitComment(comment, rating, content_id, user_id, title);
+            }} users={userData}
+            clickUser={(id) => {
+              goUserProfile(id);
+            }} />} />
+
+          <Route path="/suggestion" element={<Suggestions />} />
 
 
 
         </Routes>
+        <Snackbar
+          open={SnackOpen}
+          // style={{backgroundColor:"red"}}
+          autoHideDuration={2000}
+          onClose={handleClose}
+          message={snackMessage} />
+
+
       </div>
     </>
   );

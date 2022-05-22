@@ -39,6 +39,7 @@ const styles = {
   contentCard:'contentCard_a4a8c812',
   detailField:'detailField_a4a8c812',
   detailLabel:'detailLabel_a4a8c812',
+  collapse:'collapse_a4a8c812',
 
 };
 

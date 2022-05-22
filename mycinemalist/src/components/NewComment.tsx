@@ -48,12 +48,15 @@ import { common } from "@material-ui/core/colors";
 
 function NewComment(props) {
     
+    const [comment, setComment] = useState("")
+    const [rating, setRating] = useState(0)
+
 
     return (
         <>
             <div
                 className={commonStyles.contentCard}
-                style={{ width: "100%", padding: "5px", margin: "10px" }}
+                style={{ width: "100%",  marginBottom: "15px" }}
 
             >
                 <Stack
@@ -67,6 +70,12 @@ function NewComment(props) {
                         <TextField
                         placeholder="Añadir nuevo comentario..."
                         style={{minHeight:"70px"}}
+                        onChange={(
+                            ev: React.SyntheticEvent<HTMLElement, Event>,
+                            comment: string
+                          ) => {
+                           setComment(comment);
+                          }}
                             label="" multiline autoAdjustHeight />
                     </div>
                     <div
@@ -77,15 +86,16 @@ function NewComment(props) {
                             max={5}
                             size={RatingSize.Large}
                             // value={2}
-                            onChange={(event: React.FormEvent<HTMLElement>, rating?: number) => {
-
+                            onChange={(event: React.FormEvent<HTMLElement>, ratingval?: number) => {
+                                console.log(ratingval);
+                                    setRating(ratingval);
                             }}
                             ariaLabelFormat="{0} of {1} stars"
                         />
                         <DefaultButton
                         style={{width:"70%"}}
                         onClick={()=>{
-                            props.submit()
+                            props.submit(comment, rating);
                         }}>
                             Enviar
                         </DefaultButton>

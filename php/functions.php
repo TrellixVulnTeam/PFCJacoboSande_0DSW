@@ -15,6 +15,46 @@ function getAllUsers()
     return $sentencia->fetchAll();
 }
 
+function getAllSugg()
+{
+    $db = get_db_connection_or_die();
+	$sentencia = $db->query("SELECT id, year, title, platform FROM tSuggestion");
+    return $sentencia->fetchAll();
+}
+function getSuggestion($title)
+{
+    $db = get_db_connection_or_die();
+	$sentencia = $db->prepare("SELECT id, year, title, platform FROM tSuggestion where title = ?");
+    $sentencia->execute([$title]);
+    return $sentencia->fetchObject();
+}
+function newSuggestion($sugg)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("INSERT INTO tSuggestion (year, title, platform) VALUES (?, ?, ?)");
+    return $sentencia->execute([$sugg->year, $sugg->title,$sugg->platform]);
+}
+function getAllComments()
+{
+    $db = get_db_connection_or_die();
+	$sentencia = $db->query("SELECT id, content_id, user_id, comment,rating FROM tCommentRating");
+    return $sentencia->fetchAll();
+}
+
+function newComment($comment)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("INSERT INTO tCommentRating (content_id,user_id,comment, rating) VALUES (?, ?, ?, ?)");
+    return $sentencia->execute([$comment->content_id, $comment->user_id,$comment->comment,$comment->rating]);
+}
+
+function updateUser($user)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("UPDATE tUser SET name = ?, surname = ?, description = ? WHERE id = ?");
+    return $sentencia->execute([$user->name, $user->surname, $user->description, $user->id]);
+}
+
 function getFavsUser($id)
 {
     $db = get_db_connection_or_die();
