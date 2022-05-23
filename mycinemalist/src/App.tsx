@@ -118,8 +118,12 @@ function App(props) {
       mode: "cors",
     });
     let users = await usersfetch.json();
-
+    console.log(users);
     users.map((item) => {
+      console.log(typeof(item.is_admin));
+      console.log(item.is_admin);
+
+
       var user = new User(item);
       console.log(user);
       dataUsers[user.id] = user;
@@ -415,7 +419,7 @@ function App(props) {
               goUserProfile(id);
             }} />} />
 
-          <Route path="/suggestion" element={<Suggestions />} />
+          <Route path="/suggestion" element={<Suggestions  user={userData[window.localStorage.getItem('id')]}/>} />
 
 
 

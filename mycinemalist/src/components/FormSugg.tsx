@@ -49,9 +49,9 @@ import { Box, Typography, Modal, Button } from "@material-ui/core";
 
 function FormSugg(props) {
 
-    const [title, setTitle] = useState("")
-    const [year, setYear] = useState("")
-    const [platform, setPlatform] = useState("")
+    const [title, setTitle] = useState(props.sugg?props.sugg.title:"")
+    const [year, setYear] = useState(props.sugg?props.sugg.year:"")
+    const [platform, setPlatform] = useState(props.sugg?props.sugg.platform:"")
     const [director, setDirector] = useState("")
     const [leading_actors, setLeading_actors] = useState("")
     const [sinopsis, setSinopsis] = useState("")

@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { User } from "../common/User";
 import { Content } from "../common/Content";
@@ -6,8 +7,8 @@ import ContentCard from "./ContentCard";
 import { getLeadingCommentRanges } from "typescript";
 import { common } from "@material-ui/core/colors";
 import NewComment from "./NewComment";
-import { CircularProgress } from "@material-ui/core";
-import { DefaultButton, getIconClassName, Stack, TextField } from "office-ui-fabric-react";
+import { Button, CircularProgress } from "@material-ui/core";
+import { Callout, DefaultButton, getIconClassName, IconButton, mergeStyleSets, Stack, TextField } from "office-ui-fabric-react";
 import * as $ from 'jquery';
 import { Suggestion } from "../common/Suggestion";
 import ReactDOM from "react-dom";
@@ -26,16 +27,23 @@ import { Console } from "console";
 function Suggestions(props) {
 
     const [loading, setLoading] = useState(true);
+    const [isOpenCallout, setIsOpenCallout] = useState(false);
+    const [dataLoaded, setDataLoaded] = useState(false);
+
+    const [targetTitle, setTargetTitle] = useState("");
+
+
     const [data, setData] = useState({})
 
     const tableSugg = useRef<any>();
     // const table =null;
     const dataSuggestions: {
-        [key: number]: Suggestion;
+        [key: string]: Suggestion;
     } = {};
 
     useEffect(() => {
         setLoading(true);
+        console.log(props);
         setTimeout(() => {
             initSugg();
         }, 100);
@@ -46,6 +54,14 @@ function Suggestions(props) {
             setLoading(false);
         }, 500);
     }, [loading])
+    
+    useEffect(() => {
+        if(Object.keys(data).length>0 && !dataLoaded){
+            fillTableSugg();
+            setDataLoaded(true);
+        }
+
+    }, [data])
 
     const initSugg = async () => {
         mountTableSugg();
@@ -64,10 +80,10 @@ function Suggestions(props) {
         suggestions.map((item) => {
             var suggestion = new Suggestion(item);
             console.log(suggestion);
-            dataSuggestions[suggestion.id] = suggestion;
+            dataSuggestions[suggestion.title] = suggestion;
             return true;
         });
-        fillTableSugg();
+        setData(dataSuggestions);
         // setLoading(false);
 
     }
@@ -75,11 +91,12 @@ function Suggestions(props) {
     const fillTableSugg = () => {
         console.log("llenar");
         let suggRow = [];
-        $.each(dataSuggestions, function (idx, listItem) {
-            console.log(listItem);
+        $.each(data, function (idx, listItem) {
+            let id = (listItem.title).split(/\s/).join('');
+            console.log(id);
             suggRow.push([
                 listItem.title,
-                `<span title='${listItem.title}'>${listItem.title}<span>`,
+                `<span  id='${id}' title='${listItem.title}'>${listItem.title}<span>`,
                 `<span title='${listItem.platform}'>${listItem.platform}<span>`,
                 `<span title='${listItem.year}'>${listItem.year}<span>`,
                 "",
@@ -167,13 +184,22 @@ function Suggestions(props) {
                     targets: -1,
                 },
                 {
+                    targets: [1, 2, 3],
+                    width: "300px"
+                },
+                {
+                    className: "Botones",
+                    width: "1%",
+                    targets: 0
+                },
+                {
                     targets: 0,
                     visible: false,
                 },
             ],
-            //   createdRow: (row, data, dataIndex, cells) => {
-            //     this.RenderizarTR(cells, data[0]);
-            //   },
+            createdRow: (row, data, dataIndex, cells) => {
+                // RenderizarTR(cells, data[0]);
+            },
             language: {
                 decimal: "",
                 emptyTable: "Sin datos",
@@ -200,36 +226,54 @@ function Suggestions(props) {
                 bAutoWidth: false,
             },
         });
+        $("#SuggTable").on("click", "tr", async function () {
+            let id = $(this).children(0)[0].childNodes[0].attributes.title.value;
+            let title = id.split(/\s/).join('');
+
+            setTargetTitle(id);
+            setIsOpenCallout(true);
+
+        });
         setTimeout(() => {
             tableSugg.current.responsive.recalc();
             tableSugg.current.columns.adjust().draw();
         }, 100);
     }
 
-    const newSuggestion = async (admin) => {
+
+    const newSuggestion = async (admin,title) => {
+        console.log(title);
+        console.log(data);
+        let suggestion = data[title];
+        console.log(suggestion);
         var Formulario;
 
         async function SubmitForm(
             suggest: any,
         ) {
-            const util = JSON.stringify(suggest);
+            if(title){
 
-            const respuesta = await fetch(`http://localhost:8080/newSuggestion.php`, {
-                mode: 'cors',
-                method: "POST",
-                body: util,
-            });
-            //   push a bbdd
-            const succes = await respuesta.json();
-            console.log(succes);
-            if (succes) {
-              
+            }else{
+                const util = JSON.stringify(suggest);
+
+                const respuesta = await fetch(`http://localhost:8080/newSuggestion.php`, {
+                    mode: 'cors',
+                    method: "POST",
+                    body: util,
+                });
+                //   push a bbdd
+                const succes = await respuesta.json();
+                console.log(succes);
+                if (succes) {
+    
+                }
+                setTimeout(() => {
+                    updateTable(suggest.title);
+                }, 1100);
+    
+                // añadir la sugerencia a tabla e item
             }
-            setTimeout(() => {
-                updateTable(suggest.title);
-            },1100);
-
-            // añadir la sugerencia a tabla e item
+           
 
 
             return true;
@@ -238,6 +282,7 @@ function Suggestions(props) {
         Formulario = (
             <FormSugg
                 submit={SubmitForm.bind(this)}
+                sugg = {suggestion}
                 context={props.context}
                 admin={admin}
             ></FormSugg>
@@ -248,38 +293,63 @@ function Suggestions(props) {
         ReactDOM.render(Formulario, container);
     }
 
-    const updateTable = async (title) =>{
+    const updateTable = async (title) => {
         let sugg;
         // console.log(suggest);
         const suggestion = await fetch(`http://localhost:8080/getSuggestion.php?title=${title}`, {
             mode: "cors",
-          });
-          sugg = await suggestion.json();
-          console.log(sugg);
-          let newRow = createNewSugg(sugg);
-          tableSugg.current.rows.add(newRow);
-          tableSugg.current.draw();
-          tableSugg.current.responsive.recalc();
-          tableSugg.current.columns.adjust().draw();
+        });
+        sugg = await suggestion.json();
+        console.log(sugg);
+        let newRow = createNewSugg(sugg);
+        tableSugg.current.rows.add(newRow);
+        tableSugg.current.draw();
+        tableSugg.current.responsive.recalc();
+        tableSugg.current.columns.adjust().draw();
     }
 
-    const createNewSugg = (sugg) =>{
+    const createNewSugg = (sugg) => {
         let newSugg = new Suggestion(sugg);
         console.log(newSugg);
-        dataSuggestions[newSugg.id] = newSugg;
+        data[newSugg.title] = newSugg;
 
         return [
-          [
-            newSugg.title,
-            `<span title='${newSugg.title}'>${newSugg.title}<span>`,
-            `<span title='${newSugg.platform}'>${newSugg.platform}<span>`,
-            `<span title='${newSugg.year}'>${newSugg.year}<span>`,
-            "",
-          ],
+            [
+                newSugg.title,
+                `<span title='${newSugg.title}'>${newSugg.title}<span>`,
+                `<span title='${newSugg.platform}'>${newSugg.platform}<span>`,
+                `<span title='${newSugg.year}'>${newSugg.year}<span>`,
+                "",
+            ],
         ];
-      }
+    }
+    const deleteSuggestion = async (title) =>{
 
-    
+        let sugg = data[title];
+
+        const respuesta = await fetch(`http://localhost:8080/delSuggestion.php?id=${sugg.id}`, {
+            method: "DELETE",
+          });
+          const succes = await respuesta.json();
+        //   setSnackMessage("Favorito eliminado");
+        var indexes = tableSugg.current
+        .rows()
+        .indexes()
+        .filter((value, index) => {
+          return sugg.title === tableSugg.current.row(value).data()[0];
+        });
+        tableSugg.current.rows(indexes).remove().draw();
+        tableSugg.current.draw();
+        
+    }
+    const styles = mergeStyleSets({
+
+        callout: {
+            width: 220,
+            padding: '15px 15px',
+        },
+
+    });
 
     // if (loading) return <Stack
     //     style={{ width: "100%", marginTop: "150px" }}
@@ -310,7 +380,7 @@ function Suggestions(props) {
             >
                 {/* añadir boton nueva sugerencia con  */}
                 <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
-                    <DefaultButton text="Nueva sugerencia" onClick={() => { newSuggestion(false); }} allowDisabledFocus />
+                    <DefaultButton text="Nueva sugerencia" onClick={() => { newSuggestion(false,null); }} allowDisabledFocus />
 
                     <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
                         <Stack grow>
@@ -339,7 +409,43 @@ function Suggestions(props) {
                     </table>
                 </div>
             </Stack>
-        </>
+
+            {isOpenCallout && props.user.isAdmin &&
+                <Callout
+                    className={styles.callout}
+                    role="dialog"
+                    gapSpace={0}
+                    target={`#${targetTitle.split(/\s/).join('')}`}
+                    onDismiss={() => {
+                        setIsOpenCallout(false);
+                    }}
+                    setInitialFocus
+                >
+                    <Stack
+                    horizontal
+                    style={{width:"100%"}}
+                    horizontalAlign="space-around">
+                    <Button
+                        style={{  border: "1px solid black", backgroundColor: "black", color: "white",fontSize:"10px"  }}
+                        onClick={() => {
+                            newSuggestion(true,targetTitle);
+                            setIsOpenCallout(false);
+                        }} 
+                    >
+                    Completar
+                </Button><Button
+                    onClick={() => {
+                        setIsOpenCallout(false);
+                        deleteSuggestion(targetTitle);
+                    }}
+                    style={{  border: "1px solid black",fontSize:"10px" }}>
+                        Borrar
+                    </Button>
+                    </Stack>
+               </Callout>
+            
+                }
+                </>
 
     );
 }

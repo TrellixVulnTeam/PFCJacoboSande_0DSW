@@ -11,7 +11,7 @@ function getAllContent()
 function getAllUsers()
 {
     $db = get_db_connection_or_die();
-	$sentencia = $db->query("SELECT id, name, surname, email,description,is_admin,profile_image FROM tUser");
+	$sentencia = $db->query("SELECT id, name, surname, email,description, is_admin,profile_image FROM tUser");
     return $sentencia->fetchAll();
 }
 

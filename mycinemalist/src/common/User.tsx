@@ -20,7 +20,7 @@ export class User {
             this.surname = Item.surname=! null? Item.surname : "";
             this.email = Item.email=! null? Item.email : "";
             this.id = Item.id=! null? Item.id : 0;
-            this.isAdmin = Item.isAdmin=! null? Item.isAdmin : false;
+            this.isAdmin = Item.is_admin === 1 ? true : false;
             this.description = Item.description=! null? Item.description : "";
             this.profileImage = Item.profileImage=! null? Item.profileImage : "";
         }
