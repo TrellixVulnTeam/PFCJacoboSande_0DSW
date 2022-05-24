@@ -54,9 +54,9 @@ function Suggestions(props) {
             setLoading(false);
         }, 500);
     }, [loading])
-    
+
     useEffect(() => {
-        if(Object.keys(data).length>0 && !dataLoaded){
+        if (Object.keys(data).length > 0 && !dataLoaded) {
             fillTableSugg();
             setDataLoaded(true);
         }
@@ -241,7 +241,7 @@ function Suggestions(props) {
     }
 
 
-    const newSuggestion = async (admin,title) => {
+    const newSuggestion = async (admin, title) => {
         console.log(title);
         console.log(data);
         let suggestion = data[title];
@@ -251,9 +251,21 @@ function Suggestions(props) {
         async function SubmitForm(
             suggest: any,
         ) {
-            if(title){
+            if (title) {
+                const util = JSON.stringify(suggest);
 
-            }else{
+                const respuesta = await fetch(`http://localhost:8080/newContent.php`, {
+                  mode: 'cors',
+                  method: "POST",
+                  body: util,
+                });
+          
+                const succes = await respuesta.json();
+                deleteSuggestion(suggest.title)
+                if (succes) {
+          
+                }
+            } else {
                 const util = JSON.stringify(suggest);
 
                 const respuesta = await fetch(`http://localhost:8080/newSuggestion.php`, {
@@ -265,15 +277,15 @@ function Suggestions(props) {
                 const succes = await respuesta.json();
                 console.log(succes);
                 if (succes) {
-    
+
                 }
                 setTimeout(() => {
                     updateTable(suggest.title);
                 }, 1100);
-    
+
                 // añadir la sugerencia a tabla e item
             }
-           
+
 
 
             return true;
@@ -282,7 +294,7 @@ function Suggestions(props) {
         Formulario = (
             <FormSugg
                 submit={SubmitForm.bind(this)}
-                sugg = {suggestion}
+                sugg={suggestion}
                 context={props.context}
                 admin={admin}
             ></FormSugg>
@@ -323,24 +335,24 @@ function Suggestions(props) {
             ],
         ];
     }
-    const deleteSuggestion = async (title) =>{
+    const deleteSuggestion = async (title) => {
 
         let sugg = data[title];
 
         const respuesta = await fetch(`http://localhost:8080/delSuggestion.php?id=${sugg.id}`, {
             method: "DELETE",
-          });
-          const succes = await respuesta.json();
+        });
+        const succes = await respuesta.json();
         //   setSnackMessage("Favorito eliminado");
         var indexes = tableSugg.current
-        .rows()
-        .indexes()
-        .filter((value, index) => {
-          return sugg.title === tableSugg.current.row(value).data()[0];
-        });
+            .rows()
+            .indexes()
+            .filter((value, index) => {
+                return sugg.title === tableSugg.current.row(value).data()[0];
+            });
         tableSugg.current.rows(indexes).remove().draw();
         tableSugg.current.draw();
-        
+
     }
     const styles = mergeStyleSets({
 
@@ -380,7 +392,7 @@ function Suggestions(props) {
             >
                 {/* añadir boton nueva sugerencia con  */}
                 <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
-                    <DefaultButton text="Nueva sugerencia" onClick={() => { newSuggestion(false,null); }} allowDisabledFocus />
+                    <DefaultButton text="Nueva sugerencia" onClick={() => { newSuggestion(false, null); }} allowDisabledFocus />
 
                     <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
                         <Stack grow>
@@ -422,30 +434,31 @@ function Suggestions(props) {
                     setInitialFocus
                 >
                     <Stack
-                    horizontal
-                    style={{width:"100%"}}
-                    horizontalAlign="space-around">
-                    <Button
-                        style={{  border: "1px solid black", backgroundColor: "black", color: "white",fontSize:"10px"  }}
-                        onClick={() => {
-                            newSuggestion(true,targetTitle);
-                            setIsOpenCallout(false);
-                        }} 
-                    >
-                    Completar
-                </Button><Button
-                    onClick={() => {
-                        setIsOpenCallout(false);
-                        deleteSuggestion(targetTitle);
-                    }}
-                    style={{  border: "1px solid black",fontSize:"10px" }}>
-                        Borrar
-                    </Button>
+                        horizontal
+                        style={{ width: "100%" }}
+                        horizontalAlign="space-around">
+                        <Button
+                            style={{ border: "1px solid black", backgroundColor: "black", color: "white", fontSize: "10px" }}
+                            onClick={() => {
+                                newSuggestion(true, targetTitle);
+                                setIsOpenCallout(false);
+                            }}
+                        >
+                            Completar
+                        </Button>
+                        <Button
+                            onClick={() => {
+                                setIsOpenCallout(false);
+                                deleteSuggestion(targetTitle);
+                            }}
+                            style={{ border: "1px solid black", fontSize: "10px" }}>
+                            Borrar
+                        </Button>
                     </Stack>
-               </Callout>
-            
-                }
-                </>
+                </Callout>
+
+            }
+        </>
 
     );
 }

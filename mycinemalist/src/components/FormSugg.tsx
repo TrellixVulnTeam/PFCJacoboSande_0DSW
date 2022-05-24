@@ -75,7 +75,7 @@ function FormSugg(props) {
             setErrorTitle("");
 
         }
-        if (year.trim() === "") {
+        if (year=== "") {
             setErrorYear("Rellene el campo");
             isOk = false;
 
@@ -281,7 +281,13 @@ function FormSugg(props) {
                                             let suggest = {
                                                 year: year,
                                                 title: title,
-                                                platform: platform
+                                                sinopsis:sinopsis,
+                                                platform: platform,
+                                                director:director,
+                                                leading_cast:leading_actors,
+                                                genre:genre,
+                                                content_type:content_type,
+                                                image:imageUrl
                                             }
                                             let TodoOk: boolean = await props.submit(
                                                 suggest

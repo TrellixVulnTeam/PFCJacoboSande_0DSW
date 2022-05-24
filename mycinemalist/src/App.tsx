@@ -252,9 +252,7 @@ function App(props) {
     setLoadingFav(true);
 
     data[title].isFav = !data[title].isFav;
-    console.log(data[title].isFav);
-
-    console.log(title);
+  
   }
 
   const goConfig = () => {
@@ -344,7 +342,7 @@ function App(props) {
   return (
     <>
       {/* <Helmet>
-          <style>{'body { background-color: #14181c;!important } *{background-color:#202830; color:#9ab ;!important}'}</style>
+          <style>{'body { background-color: #FAFAD2;!important } *{background-color:rgb(131 215 243 / 74%);}'}</style>
         </Helmet> */}
       <div className="container mt-5">
         <button onClick={test}>TEST</button>
@@ -357,7 +355,6 @@ function App(props) {
             <div
               className="btn-group">
               <Link to="/main" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link>
-              <Link to="/favorites" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Mis favoritos</Link>
               <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link>
             </div>
             {userLogged != null &&

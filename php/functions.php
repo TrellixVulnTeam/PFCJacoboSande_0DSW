@@ -8,6 +8,14 @@ function getAllContent()
 	$sentencia = $db->query("SELECT id, year, title, sinopsis, platform, director, leading_cast, genre, content_type, image, rating FROM tContent");
     return $sentencia->fetchAll();
 }
+
+function newContent($content)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("INSERT INTO tContent (year,title,sinopsis, platform,director,leading_cast, genre, content_type,image) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+    return $sentencia->execute([$content->year,$content->title,$content->sinopsis,$content->platform,$content->director,$content->leading_cast,$content->genre,$content->content_type,$content->image]);
+}
+
 function getAllUsers()
 {
     $db = get_db_connection_or_die();
@@ -28,6 +36,14 @@ function getSuggestion($title)
     $sentencia->execute([$title]);
     return $sentencia->fetchObject();
 }
+
+function delSuggestion($id)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("DELETE FROM tSuggestion WHERE id = ?");
+    return $sentencia->execute([$id]);
+}
+
 function newSuggestion($sugg)
 {
     $bd = get_db_connection_or_die();
