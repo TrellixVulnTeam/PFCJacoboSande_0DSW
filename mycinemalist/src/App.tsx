@@ -16,7 +16,7 @@ import { Helmet } from "react-helmet";
 
 import LoginRegister from './components/LoginRegister';
 import Detail from './components/Detail';
-import { initializeIcons, Stack } from 'office-ui-fabric-react';
+import { DefaultButton, initializeIcons, PrimaryButton, Stack } from 'office-ui-fabric-react';
 import { ContextualCliente } from './common/Helper';
 import { User } from './common/User';
 import { CircularProgress, Snackbar, } from '@material-ui/core';
@@ -24,7 +24,35 @@ import { setTimeout } from 'timers/promises';
 import Profile from './components/Profile';
 import Suggestions from './components/Suggestions';
 // import MuiAlert, { AlertProps } from '@material-ui/Alert';
+// import { ThemeProvider, PartialTheme } from '@fluentui/react';
+import { loadTheme } from 'office-ui-fabric-react';
 
+loadTheme({
+  palette: {
+    themePrimary: '#0078d4',
+    themeLighterAlt: '#eff6fc',
+    themeLighter: '#deecf9',
+    themeLight: '#c7e0f4',
+    themeTertiary: '#71afe5',
+    themeSecondary: '#2b88d8',
+    themeDarkAlt: '#106ebe',
+    themeDark: '#005a9e',
+    themeDarker: '#004578',
+    neutralLighterAlt: '#f8f8f8',
+    neutralLighter: '#f4f4f4',
+    neutralLight: '#eaeaea',
+    neutralQuaternaryAlt: '#dadada',
+    neutralQuaternary: '#d0d0d0',
+    neutralTertiaryAlt: '#c8c8c8',
+    neutralTertiary: '#c2c2c2',
+    neutralSecondary: '#858585',
+    neutralPrimaryAlt: '#4b4b4b',
+    neutralPrimary: '#333333',
+    neutralDark: '#272727',
+    black: '#1d1d1d',
+    white: '#ffffff'
+  }
+});
 
 function App(props) {
   const navigate = useNavigate();
@@ -120,7 +148,7 @@ function App(props) {
     let users = await usersfetch.json();
     console.log(users);
     users.map((item) => {
-      console.log(typeof(item.is_admin));
+      console.log(typeof (item.is_admin));
       console.log(item.is_admin);
 
 
@@ -140,15 +168,12 @@ function App(props) {
     let id = window.localStorage.getItem('id');
     console.log(id);
     return (id !== "null");
-    // if (id != "null") {
-    //   console.log(userLogged);
-    //   console.log(dataUsers[id]);
-    //   setUserLogged(dataUsers[id])
-    //   console.log("entre " + id);
-    //   setIsUserLogged(true);
-    // }
+  
 
   }
+
+ 
+
   const initContent = async () => {
     console.log("init");
     let content;
@@ -252,7 +277,7 @@ function App(props) {
     setLoadingFav(true);
 
     data[title].isFav = !data[title].isFav;
-  
+
   }
 
   const goConfig = () => {
@@ -263,10 +288,7 @@ function App(props) {
     });
   }
 
-  const test = async () => {
-    console.log(window.localStorage.getItem('id'));
-    console.log("isuser" + isUserLogged + " user:+" + userLogged.name);
-  }
+
   const goLogout = async () => {
     window.localStorage.setItem('id', "null");
     setIsUserLogged(false);
@@ -334,6 +356,7 @@ function App(props) {
   };
 
 
+  
   if (loading) return <Stack
     style={{ width: "100%", marginTop: "150px" }}
     horizontal
@@ -345,7 +368,7 @@ function App(props) {
           <style>{'body { background-color: #FAFAD2;!important } *{background-color:rgb(131 215 243 / 74%);}'}</style>
         </Helmet> */}
       <div className="container mt-5">
-        <button onClick={test}>TEST</button>
+     
         {isUserLogged &&
           <><Stack
             horizontal
@@ -354,12 +377,24 @@ function App(props) {
           >
             <div
               className="btn-group">
-              <Link to="/main" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link>
-              <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link>
+              {/* <Link to="/main" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link> */}
+              <PrimaryButton
+                style={{ marginRight: "20px", marginTop: "20px" }}>
+
+                <Link style={{color:"white",textDecoration:"none",fontWeight:"bold"}} to="/main" >Inicio</Link>
+
+              </PrimaryButton>
+              <PrimaryButton
+                style={{ marginRight: "20px", marginTop: "20px" }}>
+
+                <Link  style={{color:"white",textDecoration:"none",fontWeight:"bold"}} to="/suggestion">Sugerir</Link>
+
+              </PrimaryButton>
+              {/* <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link> */}
             </div>
             {userLogged != null &&
               <Stack
-                style={{ marginBottom: "10px" }}>
+                style={{ marginTop: "12px" }}>
                 <ContextualCliente
                   goConfig={() => {
                     goConfig();
@@ -416,7 +451,7 @@ function App(props) {
               goUserProfile(id);
             }} />} />
 
-          <Route path="/suggestion" element={<Suggestions  user={userData[window.localStorage.getItem('id')]}/>} />
+          <Route path="/suggestion" element={<Suggestions user={userData[window.localStorage.getItem('id')]} />} />
 
 
 

@@ -92,13 +92,13 @@ function NewComment(props) {
                             }}
                             ariaLabelFormat="{0} of {1} stars"
                         />
-                        <DefaultButton
+                        <PrimaryButton
                         style={{width:"70%"}}
                         onClick={()=>{
                             props.submit(comment, rating);
                         }}>
                             Enviar
-                        </DefaultButton>
+                        </PrimaryButton>
                     </div>
 
                 </Stack>

@@ -134,7 +134,7 @@ function Profile(props) {
                     {/* if is same user boton de edición y abrimos el panel */}
                     {sameUser &&
                         <div>
-                            <DefaultButton text="Open panel" onClick={() => { setIsOpen(true) }} />
+                            <DefaultButton text="Editar perfil" onClick={() => { setIsOpen(true) }} />
                             <Panel
                                 isOpen={isOpen}
                                 onDismiss={() => { setIsOpen(false) }}
@@ -208,7 +208,7 @@ function Profile(props) {
                                             {this.state.errorDesc}
                                         </span> */}
                                     </Stack>
-                                    <Label>Imagen de perfil</Label>
+                                    {/* <Label>Imagen de perfil</Label>
                                     <Button
                                         variant="contained"
                                         component="label"
@@ -218,7 +218,7 @@ function Profile(props) {
                                             type="file"
                                             style={{ padding: "10px" }}
                                         />
-                                    </Button>
+                                    </Button> */}
                                 </Stack>
                             </Panel>
 

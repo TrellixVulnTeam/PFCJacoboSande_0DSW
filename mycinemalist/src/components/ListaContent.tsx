@@ -38,8 +38,9 @@ import 'datatables.net-buttons/js/buttons.html5';
 import 'datatables.net-buttons/js/buttons.print';
 import ReactDOM from "react-dom";
 import ContentCard from "./ContentCard";
-import { getLeadingCommentRanges } from "typescript";
+import { GeneratedIdentifierFlags, getLeadingCommentRanges } from "typescript";
 import { common } from "@material-ui/core/colors";
+import { FiltroColumnas } from "./FiltroColumnas";
 
 
 interface IListaContentProps {
@@ -47,8 +48,8 @@ interface IListaContentProps {
     [key: string]: Content;
   };
   details: (title) => void;
-  changeFav: (title,pivot) => void;
-  selectedKey : string;
+  changeFav: (title, pivot) => void;
+  selectedKey: string;
 
 
 }
@@ -122,7 +123,7 @@ export default class ListaContent extends React.Component<
   public fillTableFavs() {
     let contentRow = [];
     $.each(this.props.data, function (idx, listItem) {
-      if(listItem.isFav){
+      if (listItem.isFav) {
         contentRow.push([
           listItem.title,
           `<span title='${listItem.title}'>${listItem.title}<span>`,
@@ -133,7 +134,7 @@ export default class ListaContent extends React.Component<
           "",
         ]);
       }
-     
+
     });
 
     this.tableFavs.rows.add(contentRow).draw();
@@ -147,7 +148,7 @@ export default class ListaContent extends React.Component<
   public geticonoAnterior() {
     return `<i class="${getIconClassName("ChevronLeftSmall")}" />`;
   }
-  public renderButtons(ElementoDOM, col, ID,table) {
+  public renderButtons(ElementoDOM, col, ID, table) {
     console.log(ID);
     let item: Content = this.props.data[ID];
     console.log("botones" + item);
@@ -165,20 +166,20 @@ export default class ListaContent extends React.Component<
 
           }}
         />
-        
+
         <IconButton iconProps={{ iconName: item.isFav ? "HeartFill" : "Heart" }} title="Favorito" ariaLabel="Favorito"
           onClick={() => {
-          if(item.isFav){
-            this.delFavTable(item);
-          }else{
-            this.insertFavTable(item);
-          }
-          if(table==="favs"){
-            this.props.changeFav(item.title,2);
-          }else{
-            this.props.changeFav(item.title,0);
-          }
-            
+            if (item.isFav) {
+              this.delFavTable(item);
+            } else {
+              this.insertFavTable(item);
+            }
+            if (table === "favs") {
+              this.props.changeFav(item.title, 2);
+            } else {
+              this.props.changeFav(item.title, 0);
+            }
+
 
 
           }}
@@ -190,28 +191,28 @@ export default class ListaContent extends React.Component<
     ReactDOM.render(StackAcciones, ElementoDOM);
   }
 
-public delFavTable(item){
-  var indexes = this.tableFavs
-  .rows()
-  .indexes()
-  .filter((value, index) => {
-      return item.title === this.tableFavs.row(value).data()[0];
-  });
-  this.tableFavs.rows(indexes).remove().draw();
-  this.tableFavs.draw();
+  public delFavTable(item) {
+    var indexes = this.tableFavs
+      .rows()
+      .indexes()
+      .filter((value, index) => {
+        return item.title === this.tableFavs.row(value).data()[0];
+      });
+    this.tableFavs.rows(indexes).remove().draw();
+    this.tableFavs.draw();
 
-}
-public insertFavTable(item){
-
-}
-public updateTableFavs(title){
-  let item = this.props.data[title];
-  if(item.isFav){
-    this.delFavTable(item);
-  }else{
-    this.insertFavTable(item);
   }
-}
+  public insertFavTable(item) {
+
+  }
+  public updateTableFavs(title) {
+    let item = this.props.data[title];
+    if (item.isFav) {
+      this.delFavTable(item);
+    } else {
+      this.insertFavTable(item);
+    }
+  }
 
   public mountTableContent() {
     var siguiente = this.geticonoSiguiente();
@@ -282,7 +283,11 @@ public updateTableFavs(title){
         {
           targets: 0,
           createdCell: (td, cellData, rowData, row, col) => {
-            this.renderButtons(td, col, cellData,"list");
+            this.renderButtons(td, col, cellData, "list");
+            window.setTimeout(()=>{
+              this.tableContent.responsive.recalc();
+              this.tableContent.columns.adjust().draw();
+            },1500)
 
           }
         },
@@ -417,7 +422,11 @@ public updateTableFavs(title){
         {
           targets: 0,
           createdCell: (td, cellData, rowData, row, col) => {
-            this.renderButtons(td, col, cellData,"favs");
+            this.renderButtons(td, col, cellData, "favs");
+            window.setTimeout(()=>{
+              this.tableFavs.responsive.recalc();
+              this.tableFavs.columns.adjust().draw();
+            },1500)
 
           }
         },
@@ -482,7 +491,58 @@ public updateTableFavs(title){
     }, 100);
   }
 
+
+  public createFilterGenre() {
+    let genreFilter = [];
+    let uniqueGenres;
+    let allgenres = [];
+    $.each(this.props.data, function (idx, listItem) {
+      console.log(listItem);
+      let genres = listItem.genre.split(",");
+      $.each(genres, function (idx, genre) {
+        allgenres.push(genre.trim());
+      });
+    });
+    uniqueGenres = allgenres.filter((c, index) => {
+      console.log(c)
+      return allgenres.indexOf(c) === index;
+    });
+    $.each(uniqueGenres, function (idx, genre) {
+      genreFilter.push({
+        Titulo: genre
+      });
+    });
+
+    return genreFilter;
+  }
+  public createFilterPlatform() {
+    let platformFilter = [];
+    let uniqueplatforms;
+    let allplatforms = [];
+    $.each(this.props.data, function (idx, listItem) {
+      console.log(listItem);
+      let platforms = listItem.platform.split(",");
+      $.each(platforms, function (idx, platform) {
+        allplatforms.push(platform.trim());
+      });
+    });
+    uniqueplatforms = allplatforms.filter((c, index) => {
+      console.log(c)
+      return allplatforms.indexOf(c) === index;
+    });
+    $.each(uniqueplatforms, function (idx, platform) {
+      platformFilter.push({
+        Titulo: platform
+      });
+    });
+
+    return platformFilter;
+  }
   render(): React.ReactElement<IListaContentProps> {
+
+
+
+ 
 
     return (
       <>
@@ -506,16 +566,39 @@ public updateTableFavs(title){
                 display: "block",
               }}
             >
-              <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
+              <Stack styles={{ root: { width: "100%", marginBottom: "25px", marginTop: "20px" } }} verticalAlign={'center'} horizontal horizontalAlign={'space-between'} tokens={{ childrenGap: 15 }}>
+                <Stack horizontal horizontalAlign="space-between">
+                  <FiltroColumnas
+                    Titulo="Género"
+                    Opciones={this.createFilterGenre()}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableContent.columns(3).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                  <FiltroColumnas
+                    Titulo="Plataforma"
+                    Opciones={this.createFilterPlatform()}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableContent.columns(2).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                </Stack>
                 <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
                   <Stack grow>
-                    <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{ width: '100%',
-                    // backgroundColor:"#202830",color:"#9ab"
-                   }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+                    <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{
+                      width: '100%',
+                      // backgroundColor:"#202830",color:"#9ab"
+                    }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
                       this.tableContent.search(newValue).draw();
                     }} />
                   </Stack>
-                  
+
                 </Stack>
               </Stack>
               <div
@@ -549,13 +632,39 @@ public updateTableFavs(title){
                 display: "block",
               }}
             >
-              <Stack styles={{ root: { width: "100%", marginBottom: "25px" } }} verticalAlign={'center'} horizontalAlign={'end'} tokens={{ childrenGap: 15 }}>
+               <Stack styles={{ root: { width: "100%", marginBottom: "25px", marginTop: "20px" } }} verticalAlign={'center'} horizontal horizontalAlign={'space-between'} tokens={{ childrenGap: 15 }}>
+                <Stack horizontal horizontalAlign="space-between">
+                  <FiltroColumnas
+                    Titulo="Género"
+                    Opciones={this.createFilterGenre()}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableFavs.columns(3).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                  <FiltroColumnas
+                    Titulo="Plataforma"
+                    Opciones={this.createFilterPlatform()}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableFavs.columns(2).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                </Stack>
                 <Stack styles={{ root: { width: "30%" } }} horizontalAlign={'end'} wrap={true} verticalAlign={"end"} horizontal tokens={{ childrenGap: 20 }}>
                   <Stack grow>
-                    <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{ width: '100%' }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+                    <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{
+                      width: '100%',
+                      // backgroundColor:"#202830",color:"#9ab"
+                    }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
                       this.tableFavs.search(newValue).draw();
                     }} />
                   </Stack>
+
                 </Stack>
               </Stack>
               <div
@@ -598,15 +707,15 @@ public updateTableFavs(title){
                   // // return  <ContentCard key={key} item={listitem}></ContentCard>
                   // return <h2>hola</h2>
                   Object.entries(this.props.data).map(([key, value]) => (
-                    <ContentCard 
-                    changeFav={(title,pivot) => {
-                      this.props.changeFav(title,pivot);
-                      this.updateTableFavs(title);
-                    }} 
-                    key={key} item={value} 
-                    details={(title) => { 
-                      this.props.details(title);
-                     }}
+                    <ContentCard
+                      changeFav={(title, pivot) => {
+                        this.props.changeFav(title, pivot);
+                        this.updateTableFavs(title);
+                      }}
+                      key={key} item={value}
+                      details={(title) => {
+                        this.props.details(title);
+                      }}
 
                     />
                   ))}

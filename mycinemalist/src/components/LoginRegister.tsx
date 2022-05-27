@@ -423,7 +423,7 @@ render(): React.ReactElement < ILoginRegisterProps > {
                         {this.state.errorDesc}
                       </span>
                     </Stack>
-                    <Label>Imagen de perfil</Label>
+                    {/* <Label>Imagen de perfil</Label>
                     <Button
                       variant="contained"
                       component="label"
@@ -433,7 +433,7 @@ render(): React.ReactElement < ILoginRegisterProps > {
                         type="file"
                         style={{ padding: "10px" }}
                       />
-                    </Button>
+                    </Button> */}
                     <Stack>
                       <TextField
                         label={"Email"}
