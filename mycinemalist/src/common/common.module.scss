@@ -1,0 +1,100 @@
+@import "../common/common.css";
+// @import '~@microsoft/sp-office-ui-fabric-core/dist/sass/SPFabricCore.scss';
+@import 'https://cdn.datatables.net/responsive/2.2.3/css/responsive.bootstrap.min.css';    
+@import 'https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css';  
+@import 'https://cdn.datatables.net/buttons/1.6.0/css/buttons.dataTables.min.css';  
+
+$transition-collapse:         height .35s ease;
+
+.formLoggin{
+    background-color: #ccc;
+    width: 40%;
+    border: 1px solid white;
+    padding: 5%;
+    padding-top:2% ;
+    padding-bottom:0px ;
+
+}
+
+.logginRegister{
+    background-color: lightsalmon !important;
+}
+.divTarjetas{
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+
+    
+}
+.collapse {
+  &:not(.show) {
+    display: none;
+  }
+}
+.button  {
+  // Our button
+  text-decoration: none;
+  height: 32px;
+
+  // Primary Button
+  min-width: 80px;
+  background-color: #0078d4;
+  border-color: #0078d4;
+  color: #ffffff;
+
+  // Basic Button
+  outline: transparent;
+  position: relative;
+  font-family: "Segoe UI WestEuropean","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif;
+  -webkit-font-smoothing: antialiased;
+  font-size: medium;
+  font-weight: normal;
+  border-width: 0;
+  text-align: center;
+  cursor: pointer;
+  display: inline-block;
+  padding: 0 16px;
+
+  .label {
+    font-weight: 600;
+    font-size: medium;
+    height: 32px;
+    line-height: 32px;
+    margin: 0 4px;
+    vertical-align: top;
+    display: inline-block;
+  }
+}
+#notificacion {
+  display: 'flex';
+  align-items: 'center';
+  justify-content:'space-between';
+  flex-wrap: 'nowrap';
+  font-style: italic;
+  margin-left: 15px;
+}
+
+.collapsing {
+  height: 0;
+  overflow: hidden;
+  // @include transition($transition-collapse);
+}
+.errorSpan{
+    margin-top:5px;
+    color:rgb(164, 38, 44);
+  }
+  .contentCard{
+    box-shadow: 0 0 1rem 0 rgba(0, 0, 0, .2); 
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, .15);
+    
+    backdrop-filter: blur(5px);
+  }
+  .detailField{
+    font-weight: normal;
+    margin-right: 20px;
+  }
+  .detailLabel{
+font-weight: bold;
+// text-decoration: underline;
+  }
