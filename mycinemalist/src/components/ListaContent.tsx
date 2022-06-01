@@ -27,6 +27,7 @@ import {
   IContextualMenuItem,
   getIconClassName,
   initializeIcons,
+  Rating,
 } from "office-ui-fabric-react";
 import { Helmet } from "react-helmet";
 
@@ -77,25 +78,22 @@ export default class ListaContent extends React.Component<
   }
 
   public componentDidMount() {
-
+    // Inicializamos el contenido
     this.initContent();
-
+    window.addEventListener("resize", (e: Event) => {
+      this.tableFavs.responsive.recalc();
+      this.tableFavs.columns.adjust().draw();
+      this.tableContent.responsive.recalc();
+      this.tableContent.columns.adjust().draw();
+    });
   }
-  public component
-  public componentDidUpdate(
-    prevProps: Readonly<IListaContentProps>,
-    prevState: Readonly<IListaContentState>,
-    snapshot?: any
-  ): void { }
-
 
   public async initContent() {
-
+    // Montamos las tablas y las llenamos de contenido
     this.mountTableContent();
     this.mountTableFavs();
     this.fillTableContent();
     this.fillTableFavs();
-
   }
 
   public fillTableContent() {
@@ -108,12 +106,11 @@ export default class ListaContent extends React.Component<
         `<span title='${listItem.platform}'>${listItem.platform}<span>`,
         `<span title='${listItem.genre}'>${listItem.genre}<span>`,
         `<span title='${listItem.year}'>${listItem.year}<span>`,
-        `<span title='${listItem.rating}'>${listItem.rating}<span>`,
+        listItem.rating,
+        listItem.content_type,
         "",
       ]);
     });
-    console.log(contentRow);
-
     this.tableContent.rows.add(contentRow).draw();
     this.tableContent.draw();
     this.tableContent.responsive.recalc();
@@ -130,11 +127,11 @@ export default class ListaContent extends React.Component<
           `<span title='${listItem.platform}'>${listItem.platform}<span>`,
           `<span title='${listItem.genre}'>${listItem.genre}<span>`,
           `<span title='${listItem.year}'>${listItem.year}<span>`,
-          `<span title='${listItem.rating}'>${listItem.rating}<span>`,
+          listItem.rating,
+          listItem.content_type,
           "",
         ]);
       }
-
     });
 
     this.tableFavs.rows.add(contentRow).draw();
@@ -142,12 +139,7 @@ export default class ListaContent extends React.Component<
     this.tableFavs.responsive.recalc();
     this.tableFavs.columns.adjust().draw();
   }
-  public geticonoSiguiente() {
-    return `<i class="${getIconClassName("ChevronRightSmall")}" />`;
-  }
-  public geticonoAnterior() {
-    return `<i class="${getIconClassName("ChevronLeftSmall")}" />`;
-  }
+ 
   public renderButtons(ElementoDOM, col, ID, table) {
     console.log(ID);
     let item: Content = this.props.data[ID];
@@ -155,18 +147,13 @@ export default class ListaContent extends React.Component<
     console.log(this.props.data);
     var StackAcciones = (
       <Stack grow={false} tokens={{ childrenGap: 8 }} horizontal horizontalAlign={'space-between'}>
-
-
         <IconButton iconProps={{ iconName: 'Go' }} title="Abrir en nueva pestaña" ariaLabel="Abrir en nueva pestaña"
           disabled={false}
           checked={false}
           onClick={() => {
             this.props.details(item.title);
-
-
           }}
         />
-
         <IconButton iconProps={{ iconName: item.isFav ? "HeartFill" : "Heart" }} title="Favorito" ariaLabel="Favorito"
           onClick={() => {
             if (item.isFav) {
@@ -179,17 +166,29 @@ export default class ListaContent extends React.Component<
             } else {
               this.props.changeFav(item.title, 0);
             }
-
-
-
           }}
         />
-
       </Stack>
     )
-
     ReactDOM.render(StackAcciones, ElementoDOM);
   }
+
+  public renderFavs(ElementoDOM, col, rating) {
+    console.log(rating);
+    var StackAcciones = (
+      <Stack grow={false} tokens={{ childrenGap: 8 }} horizontal horizontalAlign={'space-between'}>
+        <Rating
+          min={0}
+          max={5}
+          rating={rating}
+          readOnly
+          ariaLabelFormat="{0} of {1} stars"
+        />
+      </Stack>
+    )
+    ReactDOM.render(StackAcciones, ElementoDOM);
+  }
+
 
   public delFavTable(item) {
     var indexes = this.tableFavs
@@ -214,14 +213,21 @@ export default class ListaContent extends React.Component<
     }
   }
 
+  public geticonoSiguiente() {
+    return `<i class="${getIconClassName("ChevronRightSmall")}" />`;
+  }
+  public geticonoAnterior() {
+    return `<i class="${getIconClassName("ChevronLeftSmall")}" />`;
+  }
   public mountTableContent() {
+    // Recuperamos los iconos para la tabla
     var siguiente = this.geticonoSiguiente();
     var anterior = this.geticonoAnterior();
-    // Meter iconos de material ui
-    // this.renderIcons();
+
     $.extend($.fn.dataTable.defaults, {
       responsive: true,
     });
+    // Funciones para ordenar correctamente fechas
     $.extend($.fn.dataTableExt.oSort, {
       "date-eu-asc": function (a, b) {
         if (a === "") return 1;
@@ -259,6 +265,7 @@ export default class ListaContent extends React.Component<
         }
       },
     });
+    // Iniciamos Datatable y configuracion
     this.tableContent = $("#ContentTable").DataTable({
       info: true,
       pagingType: "simple",
@@ -274,27 +281,38 @@ export default class ListaContent extends React.Component<
       },
 
       buttons: [],
-      // lengthMenu: [[1, 2, 3, -1], [10, 25, 50, "All"]],
+      // Definiciones de columnas
       columnDefs: [
         {
+          // Quitamos el la función de ordenación de las columnas 0 y 3
           orderable: false,
           targets: [0, 3]
         },
         {
+          // Callback para cuando creamos la celda 0, donde irán los botones
           targets: 0,
           createdCell: (td, cellData, rowData, row, col) => {
             this.renderButtons(td, col, cellData, "list");
-            window.setTimeout(()=>{
+            window.setTimeout(() => {
               this.tableContent.responsive.recalc();
               this.tableContent.columns.adjust().draw();
-            },1500)
-
+            }, 1500)
           }
         },
         {
+          target: 6,
+          visible: false,
+        },
+        {
+          // Callback para cuando creamos la celda 5, donde irá el rating
           targets: 5,
           createdCell: (td, cellData, rowData, row, col) => {
-            // this.RenderRating(td, col, cellData);
+            this.renderFavs(td, col, cellData);
+            window.setTimeout(() => {
+              this.tableContent.responsive.recalc();
+              this.tableContent.columns.adjust().draw();
+            }, 1500)
+
           }
         },
         {
@@ -317,9 +335,7 @@ export default class ListaContent extends React.Component<
           targets: 0,
         },
       ],
-      //   createdRow: (row, data, dataIndex, cells) => {
-      //     this.RenderizarTR(cells, data[0]);
-      //   },
+      // Definiciones de textos a mostrar en la tabla
       language: {
         decimal: "",
         emptyTable: "Sin datos",
@@ -423,23 +439,32 @@ export default class ListaContent extends React.Component<
           targets: 0,
           createdCell: (td, cellData, rowData, row, col) => {
             this.renderButtons(td, col, cellData, "favs");
-            window.setTimeout(()=>{
+            window.setTimeout(() => {
               this.tableFavs.responsive.recalc();
               this.tableFavs.columns.adjust().draw();
-            },1500)
+            }, 1500)
 
           }
         },
         {
           targets: 5,
           createdCell: (td, cellData, rowData, row, col) => {
-            // this.RenderRating(td, col, cellData);
+            this.renderFavs(td, col, cellData);
+            window.setTimeout(() => {
+              this.tableFavs.responsive.recalc();
+              this.tableFavs.columns.adjust().draw();
+            }, 1500)
+
           }
         },
         {
           className: "control",
           orderable: false,
           targets: -1,
+        },
+        {
+          target: 6,
+          visible: false,
         },
         {
           className:
@@ -492,6 +517,7 @@ export default class ListaContent extends React.Component<
   }
 
 
+
   public createFilterGenre() {
     let genreFilter = [];
     let uniqueGenres;
@@ -541,8 +567,15 @@ export default class ListaContent extends React.Component<
   render(): React.ReactElement<IListaContentProps> {
 
 
+    const filterType = [
+      {
+        Titulo: "Serie"
+      },
+      {
+        Titulo: "Pelicula"
+      },
+    ]
 
- 
 
     return (
       <>
@@ -555,8 +588,18 @@ export default class ListaContent extends React.Component<
             width: "100%",
           }}
           defaultSelectedKey={this.props.selectedKey}
+          onLinkClick={(item?: PivotItem, ev?: React.MouseEvent<HTMLElement>) => {
+            window.setTimeout(() => {
+              this.tableFavs.responsive.recalc();
+              this.tableFavs.columns.adjust().draw();
+              this.tableContent.responsive.recalc();
+              this.tableContent.columns.adjust().draw();
+            }, 100)
+
+          }}
         >
-          <PivotItem headerText="Lista" alwaysRender={true} itemKey="0">
+          <PivotItem headerText="Lista" alwaysRender={true} itemKey="0"
+          >
             <Stack
               className={commonStyles.espacioTabs}
               id="contentStack"
@@ -585,6 +628,16 @@ export default class ListaContent extends React.Component<
                       (FiltroSeleccionado: string) => {
                         // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
                         this.tableContent.columns(2).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                  <FiltroColumnas
+                    Titulo="Tipo"
+                    Opciones={filterType}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableContent.columns(6).search(FiltroSeleccionado).draw();
                       }
                     }
                   ></FiltroColumnas>
@@ -632,7 +685,7 @@ export default class ListaContent extends React.Component<
                 display: "block",
               }}
             >
-               <Stack styles={{ root: { width: "100%", marginBottom: "25px", marginTop: "20px" } }} verticalAlign={'center'} horizontal horizontalAlign={'space-between'} tokens={{ childrenGap: 15 }}>
+              <Stack styles={{ root: { width: "100%", marginBottom: "25px", marginTop: "20px" } }} verticalAlign={'center'} horizontal horizontalAlign={'space-between'} tokens={{ childrenGap: 15 }}>
                 <Stack horizontal horizontalAlign="space-between">
                   <FiltroColumnas
                     Titulo="Género"
@@ -651,6 +704,16 @@ export default class ListaContent extends React.Component<
                       (FiltroSeleccionado: string) => {
                         // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
                         this.tableFavs.columns(2).search(FiltroSeleccionado).draw();
+                      }
+                    }
+                  ></FiltroColumnas>
+                  <FiltroColumnas
+                    Titulo="Tipo"
+                    Opciones={filterType}
+                    onchange={
+                      (FiltroSeleccionado: string) => {
+                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
+                        this.tableFavs.columns(6).search(FiltroSeleccionado).draw();
                       }
                     }
                   ></FiltroColumnas>
@@ -700,25 +763,19 @@ export default class ListaContent extends React.Component<
             >
               <div className={commonStyles.divTarjetas}
               >
-                {
-                  // Object.keys(this.props.dataContent).map((key:string)=>{
-                  //   let listitem = this.props.dataContent[key];
-                  //   console.log("hola"+listitem);
-                  // // return  <ContentCard key={key} item={listitem}></ContentCard>
-                  // return <h2>hola</h2>
-                  Object.entries(this.props.data).map(([key, value]) => (
-                    <ContentCard
-                      changeFav={(title, pivot) => {
-                        this.props.changeFav(title, pivot);
-                        this.updateTableFavs(title);
-                      }}
-                      key={key} item={value}
-                      details={(title) => {
-                        this.props.details(title);
-                      }}
+                {Object.entries(this.props.data).map(([key, value]) => (
+                  <ContentCard
+                    changeFav={(title, pivot) => {
+                      this.props.changeFav(title, pivot);
+                      this.updateTableFavs(title);
+                    }}
+                    key={key} item={value}
+                    details={(title) => {
+                      this.props.details(title);
+                    }}
 
-                    />
-                  ))}
+                  />
+                ))}
 
               </div>
 

@@ -267,7 +267,7 @@ function Suggestions(props) {
                 }
             } else {
                 const util = JSON.stringify(suggest);
-
+                console.log(util);
                 const respuesta = await fetch(`http://localhost:8080/newSuggestion.php`, {
                     mode: 'cors',
                     method: "POST",

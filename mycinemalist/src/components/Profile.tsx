@@ -78,6 +78,9 @@ function Profile(props) {
                 <PrimaryButton onClick={() => { 
                     setTimeout(() => {
                         props.updateProfile(name,surname,description,image,props.location.state.user.id);
+                        setName(name);
+                        setDescription(description);
+                        setSurname(surname);
                         setIsOpen(false);
                     }, 500);     
               

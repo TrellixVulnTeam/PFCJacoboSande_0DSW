@@ -47,7 +47,7 @@ function delSuggestion($id)
 function newSuggestion($sugg)
 {
     $bd = get_db_connection_or_die();
-    $sentencia = $bd->prepare("INSERT INTO tSuggestion (year, title, platform) VALUES (?, ?, ?)");
+    $sentencia = $bd->prepare("INSERT INTO tSuggestion (year, title,         platform) VALUES (?, ?, ?)");
     return $sentencia->execute([$sugg->year, $sugg->title,$sugg->platform]);
 }
 function getAllComments()
@@ -70,6 +70,14 @@ function updateUser($user)
     $sentencia = $bd->prepare("UPDATE tUser SET name = ?, surname = ?, description = ? WHERE id = ?");
     return $sentencia->execute([$user->name, $user->surname, $user->description, $user->id]);
 }
+
+function updateRating($rating)
+{
+    $bd = get_db_connection_or_die();
+    $sentencia = $bd->prepare("UPDATE tContent SET rating = ? WHERE id = ?");
+    return $sentencia->execute([$rating->rating, $rating->id]);
+}
+
 
 function getFavsUser($id)
 {

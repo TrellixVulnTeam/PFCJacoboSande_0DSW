@@ -168,11 +168,11 @@ function App(props) {
     let id = window.localStorage.getItem('id');
     console.log(id);
     return (id !== "null");
-  
+
 
   }
 
- 
+
 
   const initContent = async () => {
     console.log("init");
@@ -230,14 +230,6 @@ function App(props) {
     });
   }
 
-  const goUserProfile = (id) => {
-    console.log(id);
-    navigate("/profile", {
-      state: {
-        user: userData[id]
-      }
-    });
-  }
 
   const changeFav = async (title, pivot) => {
     if (data[title].isFav) {
@@ -312,6 +304,21 @@ function App(props) {
       body: util,
     });
     const exitoso = await respuesta.json();
+
+    let calcrating = (Math.round(((data[title].rating + rating) / 2) * 2) / 2).toFixed(1)
+    let newrating = {
+      id: content_id,
+      rating: calcrating
+    }
+    const cargaUtil = JSON.stringify(newrating);
+
+    const resp = await fetch(`http://localhost:8080/updateRating.php`, {
+      method: "PUT",
+      body: cargaUtil,
+    });
+    const exito = await resp.json();
+
+    console.log(respuesta);
     setLoading(true);
     window.setTimeout(() => {
       setLoading(false);
@@ -329,7 +336,6 @@ function App(props) {
   }
 
   const updateProfile = async (name, surname, description, image, id) => {
-
     let user = {
       id: id,
       name: name,
@@ -343,9 +349,21 @@ function App(props) {
       method: "PUT",
       body: cargaUtil,
     });
-
-    console.log(respuesta);
+    userData[id].name = name;
+    userData[id].surname = surname;
+    userData[id].description = description;
+    goUserProfile(id);
   }
+
+  const goUserProfile = (id) => {
+    console.log(id);
+    navigate("/profile", {
+      state: {
+        user: userData[id]
+      }
+    });
+  }
+
 
   const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -356,7 +374,7 @@ function App(props) {
   };
 
 
-  
+
   if (loading) return <Stack
     style={{ width: "100%", marginTop: "150px" }}
     horizontal
@@ -368,7 +386,7 @@ function App(props) {
           <style>{'body { background-color: #FAFAD2;!important } *{background-color:rgb(131 215 243 / 74%);}'}</style>
         </Helmet> */}
       <div className="container mt-5">
-     
+
         {isUserLogged &&
           <><Stack
             horizontal
@@ -381,13 +399,13 @@ function App(props) {
               <PrimaryButton
                 style={{ marginRight: "20px", marginTop: "20px" }}>
 
-                <Link style={{color:"white",textDecoration:"none",fontWeight:"bold"}} to="/main" >Inicio</Link>
+                <Link style={{ color: "white", textDecoration: "none", fontWeight: "bold" }} to="/main" >Inicio</Link>
 
               </PrimaryButton>
               <PrimaryButton
                 style={{ marginRight: "20px", marginTop: "20px" }}>
 
-                <Link  style={{color:"white",textDecoration:"none",fontWeight:"bold"}} to="/suggestion">Sugerir</Link>
+                <Link style={{ color: "white", textDecoration: "none", fontWeight: "bold" }} to="/suggestion">Sugerir</Link>
 
               </PrimaryButton>
               {/* <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link> */}

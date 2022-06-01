@@ -49,9 +49,9 @@ import { Box, Typography, Modal, Button } from "@material-ui/core";
 
 function FormSugg(props) {
 
-    const [title, setTitle] = useState(props.sugg?props.sugg.title:"")
-    const [year, setYear] = useState(props.sugg?props.sugg.year:"")
-    const [platform, setPlatform] = useState(props.sugg?props.sugg.platform:"")
+    const [title, setTitle] = useState(props.sugg ? props.sugg.title : "")
+    const [year, setYear] = useState(props.sugg ? props.sugg.year : "")
+    const [platform, setPlatform] = useState(props.sugg ? props.sugg.platform : "")
     const [director, setDirector] = useState("")
     const [leading_actors, setLeading_actors] = useState("")
     const [sinopsis, setSinopsis] = useState("")
@@ -71,29 +71,22 @@ function FormSugg(props) {
         if (title.trim() === "") {
             setErrorTitle("Rellene el campo");
             isOk = false;
-        }else{
+        } else {
             setErrorTitle("");
-
         }
-        if (year=== "") {
+        if (year === "") {
             setErrorYear("Rellene el campo");
             isOk = false;
-
-        }else{
+        } else {
             setErrorYear("");
-
         }
         if (platform.trim() === "") {
             setErrorPlatform("Rellene el campo");
             isOk = false;
-
-        }else{
+        } else {
             setErrorPlatform("");
-
         }
-
         return isOk;
-
     }
 
 
@@ -281,13 +274,13 @@ function FormSugg(props) {
                                             let suggest = {
                                                 year: year,
                                                 title: title,
-                                                sinopsis:sinopsis,
+                                                sinopsis: sinopsis,
                                                 platform: platform,
-                                                director:director,
-                                                leading_cast:leading_actors,
-                                                genre:genre,
-                                                content_type:content_type,
-                                                image:imageUrl
+                                                director: director,
+                                                leading_cast: leading_actors,
+                                                genre: genre,
+                                                content_type: content_type,
+                                                image: imageUrl
                                             }
                                             let TodoOk: boolean = await props.submit(
                                                 suggest
