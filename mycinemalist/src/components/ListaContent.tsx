@@ -173,7 +173,7 @@ export default class ListaContent extends React.Component<
     ReactDOM.render(StackAcciones, ElementoDOM);
   }
 
-  public renderFavs(ElementoDOM, col, rating) {
+  public renderRating(ElementoDOM, col, rating) {
     console.log(rating);
     var StackAcciones = (
       <Stack grow={false} tokens={{ childrenGap: 8 }} horizontal horizontalAlign={'space-between'}>
@@ -307,7 +307,7 @@ export default class ListaContent extends React.Component<
           // Callback para cuando creamos la celda 5, donde irá el rating
           targets: 5,
           createdCell: (td, cellData, rowData, row, col) => {
-            this.renderFavs(td, col, cellData);
+            this.renderRating(td, col, cellData);
             window.setTimeout(() => {
               this.tableContent.responsive.recalc();
               this.tableContent.columns.adjust().draw();
@@ -449,7 +449,7 @@ export default class ListaContent extends React.Component<
         {
           targets: 5,
           createdCell: (td, cellData, rowData, row, col) => {
-            this.renderFavs(td, col, cellData);
+            this.renderRating(td, col, cellData);
             window.setTimeout(() => {
               this.tableFavs.responsive.recalc();
               this.tableFavs.columns.adjust().draw();
@@ -712,7 +712,6 @@ export default class ListaContent extends React.Component<
                     Opciones={filterType}
                     onchange={
                       (FiltroSeleccionado: string) => {
-                        // this.setState({ FiltroEstadoSeleccionado: FiltroSeleccionado });
                         this.tableFavs.columns(6).search(FiltroSeleccionado).draw();
                       }
                     }
@@ -722,7 +721,6 @@ export default class ListaContent extends React.Component<
                   <Stack grow>
                     <TextField placeholder="Búsqueda" height={10} iconProps={{ iconName: 'Search' }} style={{
                       width: '100%',
-                      // backgroundColor:"#202830",color:"#9ab"
                     }} onChange={(event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
                       this.tableFavs.search(newValue).draw();
                     }} />

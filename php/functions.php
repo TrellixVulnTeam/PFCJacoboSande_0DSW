@@ -109,7 +109,6 @@ function newFav($fav)
 }
 
 function logUser($user){
-    // $password=password_hash($user->password, PASSWORD_BCRYPT);
     $bd = get_db_connection_or_die();
     $sentencia = $bd->prepare("SELECT id,encrypted_password FROM tUser where email = ?");
      $sentencia->execute([$user->email]);
@@ -126,9 +125,3 @@ function logUser($user){
 
 
 }
-
-    // $sentencia = $bd->prepare("INSERT INTO tUser (name, surname, email,encrypted_password,description,profile_image) VALUES (?, ?, ?, ?, ?, ?)");
-    // return $sentencia->execute([$user->name, $user->surname,$user->email,$password,$user->description,""]);
-
-
-?>
