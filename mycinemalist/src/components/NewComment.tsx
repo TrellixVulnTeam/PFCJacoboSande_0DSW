@@ -75,7 +75,6 @@ function NewComment(props) {
               min={0}
               max={5}
               size={RatingSize.Large}
-              // value={2}
               onChange={(
                 event: React.FormEvent<HTMLElement>,
                 ratingval?: number

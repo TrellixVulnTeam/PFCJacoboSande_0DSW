@@ -32,33 +32,6 @@ import Suggestions from "./components/Suggestions";
 // import { ThemeProvider, PartialTheme } from '@fluentui/react';
 import { loadTheme } from "office-ui-fabric-react";
 
-loadTheme({
-  palette: {
-    themePrimary: "#0078d4",
-    themeLighterAlt: "#eff6fc",
-    themeLighter: "#deecf9",
-    themeLight: "#c7e0f4",
-    themeTertiary: "#71afe5",
-    themeSecondary: "#2b88d8",
-    themeDarkAlt: "#106ebe",
-    themeDark: "#005a9e",
-    themeDarker: "#004578",
-    neutralLighterAlt: "#f8f8f8",
-    neutralLighter: "#f4f4f4",
-    neutralLight: "#eaeaea",
-    neutralQuaternaryAlt: "#dadada",
-    neutralQuaternary: "#d0d0d0",
-    neutralTertiaryAlt: "#c8c8c8",
-    neutralTertiary: "#c2c2c2",
-    neutralSecondary: "#858585",
-    neutralPrimaryAlt: "#4b4b4b",
-    neutralPrimary: "#333333",
-    neutralDark: "#272727",
-    black: "#1d1d1d",
-    white: "#ffffff",
-  },
-});
-
 function App(props) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -88,17 +61,20 @@ function App(props) {
   const [userLogged, setUserLogged] = useState(null);
 
   useEffect(() => {
+    // Inicializamos iconos y los usuarios de l abbdd
     initializeIcons();
     getUsers();
   }, []);
 
   useEffect(() => {
+    // Reiniciamos el loadingFav para recargar la página
     window.setTimeout(() => {
       setLoadingFav(false);
     }, 500);
   }, [loadingFav]);
 
   useEffect(() => {
+    // Cuando cambie el usuario loggeado lo mandamos a la pantalla main si es != null
     if (userLogged != null) {
       window.setTimeout(() => {
         navigate("/main");
@@ -108,6 +84,7 @@ function App(props) {
   }, [userLogged]);
 
   useEffect(() => {
+    // Despues de cargar los usuarios si hay una sesion iniciada iniciamos la página
     if (usersLoaded) {
       if (checkLogged()) {
         startPage();
@@ -118,6 +95,7 @@ function App(props) {
   }, [usersLoaded]);
 
   const startPage = () => {
+    // Iniciamos la página , iniciando el contenido y seteando el usuario loggeado en un state
     setLoading(true);
     initContent();
     setIsUserLogged(true);
@@ -125,6 +103,7 @@ function App(props) {
   };
 
   const getUsers = async () => {
+    // Llamamos a los usuarios en base de datos y los mapeamos en User
     const usersfetch = await fetch(`http://localhost:8080/getAllUsers.php`, {
       mode: "cors",
     });
@@ -146,21 +125,24 @@ function App(props) {
   };
 
   const checkLogged = () => {
+    // Comprobamos si existe un usuario logeado en la página.
+    // TODO :Cambiar el sistema de gestion de sesiones
     let id = window.localStorage.getItem("id");
     console.log(id);
     return id !== "null";
   };
 
   const initContent = async () => {
-    console.log("init");
+    // Iniciamos el contenido
     let content;
     let favs;
     let favArray = [];
     try {
+      // Cargamos los content
       const contenido = await fetch(`http://localhost:8080/getAllContent.php`, {
         mode: "cors",
       });
-
+      // Cargamos todos los favoritos
       const favoritos = await fetch(
         `http://localhost:8080/getFavsUser.php?id=${window.localStorage.getItem(
           "id"
@@ -175,10 +157,12 @@ function App(props) {
     } catch (error) {
       console.log(error);
     }
+    // Llenamos el array de favoritos
     favs.map((item) => {
       favArray.push(item.content_id);
     });
     content.map((item) => {
+      // Generamos los contenidos segun lo que nos ha venido de base de datos comprobando si es favorito o no del usuario loggeado
       var content = new Content(item, isFav(item, favArray));
       dataContent[content.title] = content;
       return true;
@@ -191,13 +175,16 @@ function App(props) {
     return favs.includes(item.id);
   };
   const LoggedUser = (id: number) => {
-    console.log("loggeado");
+    // Loggeado el usuario seteamos la variable en el localStorage
+    // TODO :Cambiar el sistema de gestion de sesiones
+
     window.localStorage.setItem("id", id.toString());
     startPage();
   };
 
   const goDetails = (title) => {
-    console.log(title);
+    // Metodo para gestionar el click del boton de ir a detalles
+    // Navegamos a la pagina de detalle y enviamos el Content
     navigate("/detail", {
       state: {
         item: data[title],
@@ -207,6 +194,7 @@ function App(props) {
   };
 
   const changeFav = async (title, pivot) => {
+    // Metodo para cambiar el favorito, borramos o añadimos en base de datos segun el cambio
     if (data[title].isFav) {
       try {
         const respuesta = await fetch(
@@ -240,6 +228,7 @@ function App(props) {
       if (succes) {
       }
     }
+    // Al recargar el componente seteamos en un state la pestaña en la que nos encontramos para no cambiarle la interfazo al usuario
     setSelectedKey(pivot.toString());
     setLoadingFav(true);
 
@@ -247,6 +236,7 @@ function App(props) {
   };
 
   const goConfig = () => {
+    // Metodo para la gestión de ir al perfil del usuario desde el botón de configuración
     navigate("/profile", {
       state: {
         user: userData[window.localStorage.getItem("id")],
@@ -255,12 +245,16 @@ function App(props) {
   };
 
   const goLogout = async () => {
+    // Metodo para cerrar sesión, y reenviar al usuario a la página de login
     window.localStorage.setItem("id", "null");
     setIsUserLogged(false);
     setUserLogged(null);
     navigate("/");
   };
+
   const submitComment = async (comment, rating, content_id, user_id, title) => {
+    // Gestionamos la creación de un nuevo comentario
+    // Creamos el json del comentario y lo enviamos al servidor
     let Comment = {
       content_id: content_id,
       user_id: user_id,
@@ -269,15 +263,13 @@ function App(props) {
     };
 
     const util = JSON.stringify(Comment);
-    console.log(util);
-    // ¡Y enviarlo!
     const respuesta = await fetch(`http://localhost:8080/newComment.php`, {
       mode: "cors",
       method: "POST",
       body: util,
     });
     const exitoso = await respuesta.json();
-
+    // Calculamos el rating
     let calcrating = (
       Math.round(((data[title].rating + rating) / 2) * 2) / 2
     ).toFixed(1);
@@ -286,18 +278,17 @@ function App(props) {
       rating: calcrating,
     };
     const cargaUtil = JSON.stringify(newrating);
-
+    // Updateamos el rating del contenido segun el comentario
     const resp = await fetch(`http://localhost:8080/updateRating.php`, {
       method: "PUT",
       body: cargaUtil,
     });
     const exito = await resp.json();
 
-    console.log(respuesta);
     setLoading(true);
     window.setTimeout(() => {
       setLoading(false);
-
+      // Volvemos a la pagina de detalle
       navigate("/detail", {
         state: {
           item: data[title],
@@ -310,19 +301,20 @@ function App(props) {
   };
 
   const updateProfile = async (name, surname, description, image, id) => {
+    // Actualizamos el perfil despues de modificarlo
+    // Creamos el objeto json de usuario con los datos nuevos
     let user = {
       id: id,
       name: name,
       surname: surname,
       description: description,
     };
-    console.log(user);
     const cargaUtil = JSON.stringify(user);
-    // ¡Y enviarlo!
     const respuesta = await fetch(`http://localhost:8080/updateUser.php`, {
       method: "PUT",
       body: cargaUtil,
     });
+    // Modificamos también ls datos del usuario que maneja la aplicación para no volver a pedirlos a bbdd
     userData[id].name = name;
     userData[id].surname = surname;
     userData[id].description = description;
@@ -330,6 +322,7 @@ function App(props) {
   };
 
   const goUserProfile = (id) => {
+    // Gestión de los botones de ir a perfil del usario
     console.log(id);
     navigate("/profile", {
       state: {
@@ -361,19 +354,11 @@ function App(props) {
     );
   return (
     <>
-      {/* <Helmet>
-          <style>{'body { background-color: #FAFAD2;!important } *{background-color:rgb(131 215 243 / 74%);}'}</style>
-        </Helmet> */}
       <div className="container mt-5">
         {isUserLogged && (
           <>
-            <Stack
-              horizontal
-              // style={{display:isUserLogged?'block':'none'}}
-              horizontalAlign="space-between"
-            >
+            <Stack horizontal horizontalAlign="space-between">
               <div className="btn-group">
-                {/* <Link to="/main" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Inicio</Link> */}
                 <PrimaryButton
                   style={{ marginRight: "20px", marginTop: "20px" }}
                 >
@@ -402,7 +387,6 @@ function App(props) {
                     Sugerir
                   </Link>
                 </PrimaryButton>
-                {/* <Link to="/suggestion" className="btn btn-dark me-2 border border-3 border-white rounded mt-2">Sugerir</Link> */}
               </div>
               {userLogged != null && (
                 <Stack style={{ marginTop: "12px" }}>
@@ -457,11 +441,6 @@ function App(props) {
               }
             />
           )}
-
-          {/* <Route path="/detail" element={<Detail location={location} submit={(title, rating) => {
-            submitComment(title, rating);
-          }} />} /> */}
-
           <Route
             path="/profile"
             element={
@@ -499,7 +478,6 @@ function App(props) {
         </Routes>
         <Snackbar
           open={SnackOpen}
-          // style={{backgroundColor:"red"}}
           autoHideDuration={2000}
           onClose={handleClose}
           message={snackMessage}

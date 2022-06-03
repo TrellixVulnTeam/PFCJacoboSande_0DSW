@@ -66,6 +66,7 @@ function FormSugg(props) {
   const handleClose = () => setOpen(false);
 
   const checkValues = () => {
+    // Metodo para validar los campos sel formulario de sugerencia
     let isOk = true;
     if (title.trim() === "") {
       setErrorTitle("Rellene el campo");

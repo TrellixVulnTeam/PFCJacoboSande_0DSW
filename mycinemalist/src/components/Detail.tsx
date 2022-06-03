@@ -75,7 +75,7 @@ function Detail(props) {
 
   const loadComments = async () => {
     let comments;
-    // Mañana cambiar los comentarios de sitio.
+    // Cargamos todos los comentarios
     const comentarios = await fetch(
       `http://localhost:8080/getAllComments.php`,
       {

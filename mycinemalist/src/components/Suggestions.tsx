@@ -46,6 +46,7 @@ function Suggestions(props) {
   } = {};
 
   useEffect(() => {
+    // Cargamos la página e iniciamos las sugerencias
     setLoading(true);
     setTimeout(() => {
       initSugg();
@@ -53,12 +54,14 @@ function Suggestions(props) {
   }, []);
 
   useEffect(() => {
+    // Reiniciamos el state loading para recargar el componente
     setTimeout(() => {
       setLoading(false);
     }, 500);
   }, [loading]);
 
   useEffect(() => {
+    // Al rellenar data llenamos la tabla de sugerencias si hay alguna
     if (Object.keys(data).length > 0 && !dataLoaded) {
       fillTableSugg();
       setDataLoaded(true);
@@ -66,6 +69,7 @@ function Suggestions(props) {
   }, [data]);
 
   const initSugg = async () => {
+    // Iniciamos las sugerencias montando la tabla y trayendonos todas las sugerencias
     mountTableSugg();
     let suggestions;
     try {
@@ -81,10 +85,10 @@ function Suggestions(props) {
       return true;
     });
     setData(dataSuggestions);
-    // setLoading(false);
   };
 
   const fillTableSugg = () => {
+    // LLenamos la tabla de sugerencias con los campos que queremos mostrar, titulo, plataforma y año
     let suggRow = [];
     $.each(data, function (idx, listItem) {
       let id = listItem.title.split(/\s/).join("");
@@ -111,8 +115,7 @@ function Suggestions(props) {
   const mountTableSugg = () => {
     var siguiente = geticonoSiguiente();
     var anterior = geticonoAnterior();
-    // Meter iconos de material ui
-    // this.renderIcons();
+    // Montamos la tabla de sugerencias
     $.extend($.fn.dataTable.defaults, {
       responsive: true,
     });
@@ -220,6 +223,7 @@ function Suggestions(props) {
       },
     });
     $("#SuggTable").on("click", "tr", async function () {
+      // Metodo onclick de cada fila para abrir las opciones al administrador de la pagina
       let id = $(this).children(0)[0].childNodes[0].attributes.title.value;
       let title = id.split(/\s/).join("");
 
@@ -233,11 +237,13 @@ function Suggestions(props) {
   };
 
   const newSuggestion = async (admin, title) => {
+    // Creacion de nuna nueva sugerencia o contenido
     let suggestion = data[title];
     var Formulario;
 
     async function SubmitForm(suggest: any) {
       if (title) {
+        // Si ya existe una sugerencia, la borramos y creamos contenido
         const util = JSON.stringify(suggest);
 
         const respuesta = await fetch(`http://localhost:8080/newContent.php`, {
@@ -247,10 +253,12 @@ function Suggestions(props) {
         });
 
         const succes = await respuesta.json();
+        // Borramos la sugerencia
         deleteSuggestion(suggest.title);
         if (succes) {
         }
       } else {
+        // Creamos nueva sugerenciia
         const util = JSON.stringify(suggest);
         const respuesta = await fetch(
           `http://localhost:8080/newSuggestion.php`,
@@ -289,6 +297,7 @@ function Suggestions(props) {
   };
 
   const updateTable = async (title) => {
+    // Actualizamos la tabla de gugerencias despues de añadir una nueva
     let sugg;
     const suggestion = await fetch(
       `http://localhost:8080/getSuggestion.php?title=${title}`,
@@ -305,6 +314,7 @@ function Suggestions(props) {
   };
 
   const createNewSugg = (sugg) => {
+    // Construimos el html de la nueva sugerencia para añadir a la tabla
     let newSugg = new Suggestion(sugg);
     data[newSugg.title] = newSugg;
 
@@ -319,6 +329,7 @@ function Suggestions(props) {
     ];
   };
   const deleteSuggestion = async (title) => {
+    // Metodo para borrar sugerencias
     let sugg = data[title];
 
     const respuesta = await fetch(
@@ -328,7 +339,6 @@ function Suggestions(props) {
       }
     );
     const succes = await respuesta.json();
-    //   setSnackMessage("Favorito eliminado");
     var indexes = tableSugg.current
       .rows()
       .indexes()
@@ -345,11 +355,6 @@ function Suggestions(props) {
     },
   });
 
-  // if (loading) return <Stack
-  //     style={{ width: "100%", marginTop: "150px" }}
-  //     horizontal
-  //     horizontalAlign='center'><CircularProgress color="inherit" size="100px" /></Stack>
-  //     ;
   return (
     <>
       <Stack
@@ -373,7 +378,6 @@ function Suggestions(props) {
           display: loading ? "none" : "block",
         }}
       >
-        {/* añadir boton nueva sugerencia con  */}
         <Stack
           styles={{ root: { width: "100%", marginBottom: "25px" } }}
           verticalAlign={"center"}

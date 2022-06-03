@@ -65,7 +65,6 @@ function Profile(props) {
   );
   const [image, setImage] = useState(props.location.state.user.profileImage);
 
-  useEffect(() => {}, [description]);
   const onRenderFooterContent = (
     <div>
       <PrimaryButton
@@ -117,8 +116,6 @@ function Profile(props) {
           }}
           className={commonStyles.contentCard}
         >
-          {/* */}
-          {/* Probamos imagen vacía o si nos deja subir foto guay */}
           <img
             style={{
               width: "100%",
@@ -137,9 +134,7 @@ function Profile(props) {
             horizontal
             horizontalAlign="center"
             style={{ marginTop: "30px" }}
-          >
-            {/* media de rating y numero comentarios? */}
-          </Stack>
+          ></Stack>
         </div>
         <div
           style={{
@@ -166,7 +161,6 @@ function Profile(props) {
           </span>
           <hr />
 
-          {/* if is same user boton de edición y abrimos el panel */}
           {sameUser && (
             <div>
               <DefaultButton
@@ -186,8 +180,6 @@ function Profile(props) {
                 onRenderFooterContent={() => {
                   return onRenderFooterContent;
                 }}
-                // Stretch panel content to fill the available height so the footer is positioned
-                // at the bottom of the page
                 isFooterAtBottom={true}
               >
                 <Stack>
@@ -204,12 +196,6 @@ function Profile(props) {
                       required={true}
                       autoAdjustHeight
                     />
-                    {/* <span
-                                            className={commonStyles.errorSpan}
-                                            style={{ display: this.state.errorName ? "block" : "none" }}
-                                        >
-                                            {this.state.errorName}
-                                        </span> */}
                   </Stack>
                   <Stack>
                     <TextField
@@ -224,12 +210,6 @@ function Profile(props) {
                       required={true}
                       autoAdjustHeight
                     />
-                    {/* <span
-                                            className={commonStyles.errorSpan}
-                                            style={{ display: this.state.errorSurname ? "block" : "none" }}
-                                        >
-                                            {this.state.errorSurname}
-                                        </span> */}
                   </Stack>
                   <Stack>
                     <TextField
@@ -244,24 +224,7 @@ function Profile(props) {
                       multiline
                       autoAdjustHeight
                     />
-                    {/* <span
-                                            className={commonStyles.errorSpan}
-                                            style={{ display: this.state.errorDesc ? "block" : "none" }}
-                                        >
-                                            {this.state.errorDesc}
-                                        </span> */}
                   </Stack>
-                  {/* <Label>Imagen de perfil</Label>
-                                    <Button
-                                        variant="contained"
-                                        component="label"
-                                        style={{ margin: "1px" }}
-                                    >
-                                        <input
-                                            type="file"
-                                            style={{ padding: "10px" }}
-                                        />
-                                    </Button> */}
                 </Stack>
               </Panel>
             </div>

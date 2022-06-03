@@ -51,10 +51,8 @@ import { common } from "@material-ui/core/colors";
 import NewComment from "./NewComment";
 
 function ShowComment(props) {
-  // const [rating, setRating] = useState(props.location.state.item.rating);
-
   const [user, setUser] = useState(props.users[props.item.user_id]);
-
+  // Componente solo para mostrar comentarios, sin lógica
   if (props.content_id != props.item.content_id) return <></>;
 
   return (

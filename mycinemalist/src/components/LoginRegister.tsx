@@ -99,6 +99,7 @@ export default class LoginRegister extends React.Component<
   }
 
   public checkForm(submit?: boolean) {
+    // Método para validar los campos del registro
     let allOK = true;
     if (showErrors) {
       if (this.state.name.trim()) {
@@ -171,6 +172,7 @@ export default class LoginRegister extends React.Component<
     }
   }
   public async login() {
+    // Metodo para hacer login al usuario
     let content;
     let TodoOk: boolean;
     this.userActual = {
@@ -198,6 +200,8 @@ export default class LoginRegister extends React.Component<
     }
   }
   public async registerUser() {
+    // Metodo para registro de usuarios
+    // Construimos el json de usuario y lo mandamos al servidor
     this.userActual = {
       email: this.state.email,
       name: this.state.name,
